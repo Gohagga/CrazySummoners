@@ -18,7 +18,10 @@
     },
     "plugins": [
       {
-        "transform": "war3-transformer"
+        "transform": "war3-transformer",
+        "mapDir": "D:/wc3-projects/CrazySummonersRefactor/CrazySummoners/maps/CrazySummoners.w3x",
+        "entryFile": "D:/wc3-projects/CrazySummonersRefactor/CrazySummoners/src/main.ts",
+        "outputDir": "D:/wc3-projects/CrazySummonersRefactor/CrazySummoners/dist/CrazySummoners.w3x"
       }
     ],
     "types": [

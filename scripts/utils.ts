@@ -6,11 +6,28 @@ import { createLogger, format, transports } from "winston";
 const { combine, timestamp, printf } = format;
 const luamin = require('luamin');
 
+export interface MapInfo {
+  author: string,
+  name: string,
+  description: string,
+  recommendedPlayers: string,
+  loadingScreenTitle: string,
+  loadingScreenSubtitle: string,
+  loadingScreenDescription: string,
+}
+
 export interface IProjectConfig {
   mapFolder: string;
   minifyScript: string;
   gameExecutable: string;
   outputFolder: string;
+  archiveOutputFolders: string[];
+  version: {
+    major: number,
+    minor: number,
+    build: number,
+  };
+  mapInfo: MapInfo;
   launchArgs: string[];
   winePath?: string;
   winePrefix?: string;
@@ -26,6 +43,18 @@ export function loadJsonFile(fname: string) {
   } catch (e) {
     logger.error(e.toString());
     return {};
+  }
+}
+
+/**
+ * Load an object from a JSON file.
+ * @param fname The JSON file
+ */
+ export function saveJsonFile<T>(fname: string, data: T, format?: number | string) {
+  try {
+    return fs.writeFile(fname, JSON.stringify(data, null, format));
+  } catch (e) {
+    logger.error(e.toString());
   }
 }
 

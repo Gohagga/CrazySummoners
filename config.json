@@ -1,8 +1,26 @@
 {
-  "mapFolder": "map.w3x",
+  "mapFolder": "CrazySummoners.w3x",
   "minifyScript": false,
-  "gameExecutable": "C:\\Program Files\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe",
+  "gameExecutable": "C:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe",
   "outputFolder": "./dist/bin",
+  "archiveOutputFolders": [
+    "./versions",
+    "C:\\Users\\bartu\\Documents\\Warcraft III\\Maps\\Test\\CrazySummoners"
+  ],
+  "version": {
+    "major": 0,
+    "minor": 0,
+    "build": 4
+  },
+  "mapInfo": {
+    "author": "The_Spellweaver",
+    "name": "CrazySummoners {version}",
+    "description": "This is a description",
+    "recommendedPlayers": "nobody should play this map",
+    "loadingScreenTitle": "{version}",
+    "loadingScreenSubtitle": "CrazySummoners",
+    "loadingScreenDescription": "- Summon skills and spells cost Orbs of various colors.\r\n- Check out your spellbook to decide how to build.\r\n- Use lumber to expand your Orb pool.\r\n- If unit reaches enemy crystal, heroes on their team lose 1 hp.\r\n\r\n- Game is lost when all heroes on your team die."
+  },
   "launchArgs": [
     "-launch",
     "-windowmode",
