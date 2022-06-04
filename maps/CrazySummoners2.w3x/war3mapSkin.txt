@@ -1,0 +1,8 @@
+[Categories]
+GiantClass=TRIGSTR_1353
+TaurenClass=TRIGSTR_1354
+
+[Errors]
+Notancient=TRIGSTR_4502
+Notsapper=TRIGSTR_4501
+

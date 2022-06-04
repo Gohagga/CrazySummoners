@@ -31,8 +31,12 @@ gg_unit_h002_0013 = nil
 gg_unit_h001_0014 = nil
 gg_unit_h001_0015 = nil
 gg_unit_e000_0040 = nil
+gg_unit_h00L_0019 = nil
+gg_unit_h00L_0025 = nil
 gg_unit_h001_0006 = nil
 gg_unit_e001_0016 = nil
+gg_unit_h01L_0017 = nil
+gg_unit_h01L_0018 = nil
 function InitGlobals()
 end
 
@@ -42,7 +46,7 @@ function CreateBuildingsForPlayer0()
     local unitID
     local t
     local life
-    u = BlzCreateUnitWithSkin(p, FourCC("h00L"), -3200.0, -5056.0, 270.000, FourCC("h00L"))
+    gg_unit_h00L_0019 = BlzCreateUnitWithSkin(p, FourCC("h00L"), -3200.0, -5056.0, 270.000, FourCC("h00L"))
 end
 
 function CreateUnitsForPlayer0()
@@ -63,7 +67,7 @@ function CreateBuildingsForPlayer1()
     local unitID
     local t
     local life
-    u = BlzCreateUnitWithSkin(p, FourCC("h00L"), -3264.0, -2240.0, 270.000, FourCC("h00L"))
+    gg_unit_h00L_0025 = BlzCreateUnitWithSkin(p, FourCC("h00L"), -3264.0, -2240.0, 270.000, FourCC("h00L"))
 end
 
 function CreateBuildingsForPlayer5()
@@ -82,8 +86,6 @@ function CreateBuildingsForPlayer5()
     SetUnitColor(gg_unit_h001_0014, ConvertPlayerColor(1))
     gg_unit_h001_0015 = BlzCreateUnitWithSkin(p, FourCC("h001"), -3264.0, -4672.0, 270.000, FourCC("h001"))
     SetUnitColor(gg_unit_h001_0015, ConvertPlayerColor(1))
-    gg_unit_e000_0040 = BlzCreateUnitWithSkin(p, FourCC("e000"), 5184.0, -5440.0, 270.000, FourCC("e000"))
-    SetUnitColor(gg_unit_e000_0040, ConvertPlayerColor(0))
 end
 
 function CreateBuildingsForPlayer9()
@@ -102,8 +104,18 @@ function CreateBuildingsForPlayer9()
     SetUnitColor(gg_unit_h002_0012, ConvertPlayerColor(1))
     gg_unit_h002_0013 = BlzCreateUnitWithSkin(p, FourCC("h002"), -3264.0, -2624.0, 270.000, FourCC("h002"))
     SetUnitColor(gg_unit_h002_0013, ConvertPlayerColor(1))
+end
+
+function CreateNeutralHostileBuildings()
+    local p = Player(PLAYER_NEUTRAL_AGGRESSIVE)
+    local u
+    local unitID
+    local t
+    local life
     gg_unit_e001_0016 = BlzCreateUnitWithSkin(p, FourCC("e001"), 5184.0, -5632.0, 270.000, FourCC("e001"))
     SetUnitColor(gg_unit_e001_0016, ConvertPlayerColor(1))
+    gg_unit_e000_0040 = BlzCreateUnitWithSkin(p, FourCC("e000"), 5184.0, -5440.0, 270.000, FourCC("e000"))
+    SetUnitColor(gg_unit_e000_0040, ConvertPlayerColor(0))
 end
 
 function CreateNeutralPassive()
@@ -112,6 +124,8 @@ function CreateNeutralPassive()
     local unitID
     local t
     local life
+    gg_unit_h01L_0017 = BlzCreateUnitWithSkin(p, FourCC("h01L"), -4031.6, -5051.5, 90.618, FourCC("h01L"))
+    gg_unit_h01L_0018 = BlzCreateUnitWithSkin(p, FourCC("h01L"), -4036.3, -2227.7, 98.924, FourCC("h01L"))
     gg_unit_nDUM_0031 = BlzCreateUnitWithSkin(p, FourCC("nDUM"), -4032.5, -4927.3, 175.127, FourCC("nDUM"))
     gg_unit_nDUM_0033 = BlzCreateUnitWithSkin(p, FourCC("nDUM"), -4045.1, -2346.5, 45.177, FourCC("nDUM"))
 end
@@ -128,6 +142,7 @@ function CreatePlayerUnits()
 end
 
 function CreateAllUnits()
+    CreateNeutralHostileBuildings()
     CreatePlayerBuildings()
     CreateNeutralPassive()
     CreatePlayerUnits()
@@ -232,6 +247,10 @@ function Trig_After_Start_Copy_Actions()
     SetUnitLifePercentBJ(gg_unit_h002_0011, 100)
     SetUnitLifePercentBJ(gg_unit_h002_0012, 100)
     SetUnitLifePercentBJ(gg_unit_h002_0013, 100)
+    SetUnitLifePercentBJ(gg_unit_h00L_0019, 100)
+    SetUnitLifePercentBJ(gg_unit_h00L_0025, 100)
+    SetUnitLifePercentBJ(gg_unit_h01L_0017, 100)
+    SetUnitLifePercentBJ(gg_unit_h01L_0018, 100)
 end
 
 function InitTrig_After_Start_Copy()
@@ -416,9 +435,9 @@ function config()
     DefineStartLocation(2, 5184.0, -5568.0)
     DefineStartLocation(3, 5184.0, -5568.0)
     DefineStartLocation(4, 5184.0, -5568.0)
-    DefineStartLocation(5, -4032.0, -3584.0)
+    DefineStartLocation(5, 6080.0, -6080.0)
     DefineStartLocation(6, 5184.0, -5568.0)
-    DefineStartLocation(7, -4032.0, -3584.0)
+    DefineStartLocation(7, 6080.0, -6080.0)
     InitCustomPlayerSlots()
     InitCustomTeams()
     InitAllyPriorities()
