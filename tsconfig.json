@@ -3,6 +3,7 @@
     "baseUrl": "./src",
     "allowJs": true,
     "target": "es6",
+    "strict": true,
     "lib": [
       "es6"
     ],
@@ -13,7 +14,8 @@
         "../node_modules/*/lib/index",
         "../node_modules/*/index",
         "../node_modules/*/dist/index",
-        "../node_modules/*"
+        "../node_modules/*",
+        "*"
       ]
     },
     "plugins": [
