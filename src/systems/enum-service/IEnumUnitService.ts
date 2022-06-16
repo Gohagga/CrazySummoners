@@ -1,5 +1,5 @@
-import { Destructable, Item, Unit } from "w3ts/index";
-import { Coords } from "../../systems/coords/Coords";
+import { Destructable, Item, Rectangle, Unit } from "w3ts/index";
+import { Coords } from "../coords/Coords";
 
 export interface IEnumUnitService {
 
@@ -13,4 +13,6 @@ export interface IEnumUnitService {
     EnumDestructablesInRange(originX: number, originY: number, radius: number, filter?: (target: Destructable, caster?: Unit) => boolean, source?: Unit): Destructable[];
 
     EnumItemsInRange(originX: number, originY: number, radius: number, filter?: (target: Item, caster?: Unit) => boolean, source?: Unit): Item[];
+
+    EnumUnitsInRect(rect: Rectangle, filter?: (target: Unit) => boolean, outResult?: Unit[]): Unit[];
 }

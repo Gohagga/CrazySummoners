@@ -8,7 +8,7 @@ export type Team = {
 
 export class TeamManager {
     
-    private playerTeam: Record<number, number>;
+    private _playerTeam: Record<number, number>;
     private _teams: Record<number, Team>;
     private _teamList: Team[];
     private _players: MapPlayer[];
@@ -17,13 +17,13 @@ export class TeamManager {
         players: MapPlayer[],
         teams: Record<number, Team>
     ) {
-        this.playerTeam = {};
+        this._playerTeam = {};
         this._teamList = [];
         for (let t of Object.keys(teams)) {
             let teamNumber = Number(t);
             let team = teams[teamNumber];
             for (let member of team.teamMembers) {
-                this.playerTeam[member.id] = teamNumber;
+                this._playerTeam[member.id] = teamNumber;
             }
 
             this._teamList.push(team);
@@ -31,6 +31,10 @@ export class TeamManager {
 
         this._players = players;
         this._teams = teams;
+    }
+
+    public GetPlayerTeam(player: MapPlayer) {
+        return this._teams[this._playerTeam[player.id]];
     }
 
     public get players() {

@@ -1,4 +1,4 @@
-import { OrbType } from "content/orbs/OrbType";
+import { OrbType } from "content/constants/OrbType";
 import { MapPlayer } from "w3ts";
 import { IOrbsView } from "../interfaces/IOrbsView";
 import { IOrbViewModel } from "../interfaces/IOrbViewModel";

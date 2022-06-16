@@ -13,6 +13,16 @@ gg_rct_Red_Area = nil
 gg_rct_Blue_Area = nil
 gg_rct_PlayArea = nil
 gg_rct_BluePowerSpawn = nil
+gg_rct_CrystalRedA1 = nil
+gg_rct_CrystalRedA2 = nil
+gg_rct_CrystalRedA3 = nil
+gg_rct_CrystalRedA4 = nil
+gg_rct_CrystalRedA5 = nil
+gg_rct_CrystalBlueA1 = nil
+gg_rct_CrystalBlueA2 = nil
+gg_rct_CrystalBlueA3 = nil
+gg_rct_CrystalBlueA4 = nil
+gg_rct_CrystalBlueA5 = nil
 gg_cam_GameCamera_Red = nil
 gg_cam_GameCamera_Blue = nil
 gg_cam_GameCameraH1 = nil
@@ -37,6 +47,7 @@ gg_unit_h001_0006 = nil
 gg_unit_e001_0016 = nil
 gg_unit_h01L_0017 = nil
 gg_unit_h01L_0018 = nil
+gg_trg_Untitled_Trigger_001 = nil
 function InitGlobals()
 end
 
@@ -165,6 +176,16 @@ function CreateRegions()
     gg_rct_Blue_Area = Rect(-5024.0, -2560.0, -2976.0, -1856.0)
     gg_rct_PlayArea = Rect(-5408.0, -5664.0, -2720.0, -1728.0)
     gg_rct_BluePowerSpawn = Rect(-4928.0, -2496.0, -3328.0, -1984.0)
+    gg_rct_CrystalRedA1 = Rect(-3424.0, -4640.0, -3040.0, -4224.0)
+    gg_rct_CrystalRedA2 = Rect(-3808.0, -4640.0, -3424.0, -4224.0)
+    gg_rct_CrystalRedA3 = Rect(-4192.0, -4640.0, -3808.0, -4224.0)
+    gg_rct_CrystalRedA4 = Rect(-4576.0, -4640.0, -4192.0, -4224.0)
+    gg_rct_CrystalRedA5 = Rect(-4960.0, -4640.0, -4576.0, -4224.0)
+    gg_rct_CrystalBlueA1 = Rect(-3456.0, -3072.0, -3072.0, -2656.0)
+    gg_rct_CrystalBlueA2 = Rect(-3840.0, -3072.0, -3456.0, -2656.0)
+    gg_rct_CrystalBlueA3 = Rect(-4224.0, -3072.0, -3840.0, -2656.0)
+    gg_rct_CrystalBlueA4 = Rect(-4608.0, -3072.0, -4224.0, -2656.0)
+    gg_rct_CrystalBlueA5 = Rect(-4992.0, -3072.0, -4608.0, -2656.0)
 end
 
 function CreateCameras()
@@ -232,6 +253,16 @@ function InitTrig_Melee_Initialization()
     TriggerAddAction(gg_trg_Melee_Initialization, Trig_Melee_Initialization_Actions)
 end
 
+function Trig_Untitled_Trigger_001_Actions()
+    CreateNUnitsAtLoc(1, FourCC("hfoo"), Player(0), GetRectCenter(GetPlayableMapRect()), bj_UNIT_FACING)
+end
+
+function InitTrig_Untitled_Trigger_001()
+    gg_trg_Untitled_Trigger_001 = CreateTrigger()
+    TriggerRegisterAnyUnitEventBJ(gg_trg_Untitled_Trigger_001, EVENT_PLAYER_UNIT_DEATH)
+    TriggerAddAction(gg_trg_Untitled_Trigger_001, Trig_Untitled_Trigger_001_Actions)
+end
+
 function Trig_After_Start_Copy_Actions()
     SetUnitLifePercentBJ(gg_unit_e000_0040, 100)
     SetUnitLifePercentBJ(gg_unit_e001_0016, 100)
@@ -261,6 +292,7 @@ end
 
 function InitCustomTriggers()
     InitTrig_Melee_Initialization()
+    InitTrig_Untitled_Trigger_001()
     InitTrig_After_Start_Copy()
 end
 

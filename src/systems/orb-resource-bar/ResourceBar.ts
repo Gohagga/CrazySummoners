@@ -1,21 +1,29 @@
-import { OrbType } from "content/orbs/OrbType";
+import { OrbType } from "content/constants/OrbType";
 import { IResourceBarModel } from "ui/orbs/interfaces/IResourceBarModel";
 import { MapPlayer } from "w3ts";
 import { Orb } from "./Orb";
 import { OrbFactory } from "./OrbFactory";
 
+export interface ResourceBarConfig {
+    summoningOrbCooldown: number,
+    coloredOrbCooldown: number,
+}
+
 export class ResourceBar implements IResourceBarModel {
 
     private _orbs: Orb[] = [];
-    private orbCooldown: number = 20;
+    private coloredOrbCooldown: number;
+    private summoningOrbCooldown: number;
 
     onUpdate = () => {};
 
     constructor(
         private owner: MapPlayer,
         private orbFactory: OrbFactory,
+        config: ResourceBarConfig,
     ) {
-        
+        this.coloredOrbCooldown = config.coloredOrbCooldown;
+        this.summoningOrbCooldown = config.summoningOrbCooldown;
     }
 
     public get orbs(): Orb[] {
@@ -60,7 +68,10 @@ export class ResourceBar implements IResourceBarModel {
 
         // We have all the materials available
         for (let i of orbsToConsume) {
-            this._orbs[i].Consume(this.orbCooldown);
+            if (this._orbs[i].orbTypeId == OrbType.Summoning)
+                this._orbs[i].Consume(this.summoningOrbCooldown);
+            else
+                this._orbs[i].Consume(this.summoningOrbCooldown);
         }
 
         return true;

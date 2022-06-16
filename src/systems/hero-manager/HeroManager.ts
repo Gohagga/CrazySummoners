@@ -49,6 +49,10 @@ export class HeroManager<HeroClass extends number> implements IHeroManager {
         soldUnitTrigger.addAction(() => this.OnUnitSold());
     }
 
+    public GetPlayerHero(owner: MapPlayer): Unit | null {
+        return this.playerHero.get(owner.id) || null;
+    }
+
     public CreateHeroShop(location: Coords, owner: MapPlayer) {
         const heroShop = new Unit(owner, this.heroShopUnitTypeId, location.x, location.y, 0);
         return heroShop;
@@ -58,7 +62,8 @@ export class HeroManager<HeroClass extends number> implements IHeroManager {
         
         try {
             let sold = Unit.fromHandle(GetSoldUnit());
-            let playerId = sold.owner.id;
+            let owner = sold.owner;
+            let playerId = owner.id;
             let typeId = sold.typeId;
 
             if (typeId in this.unitTypeDef == false) return null;
@@ -68,8 +73,12 @@ export class HeroManager<HeroClass extends number> implements IHeroManager {
             let playerClass: UnitProgress | null = null;
 
             playerClass = this.heroProgressFactory[config.heroClass](sold);
-
+            playerClass.Start();
+            
             this.playerHero.set(playerId, sold);
+            SelectUnitForPlayerSingle(sold.handle, owner.handle);
+            // TODO: Remove this
+            sold.setHeroLevel(20, true);
 
         } catch (ex: any) {
             Log.Error(ex);

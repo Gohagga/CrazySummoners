@@ -1,4 +1,4 @@
-import { OrbType } from "content/orbs/OrbType";
+import { OrbType } from "content/constants/OrbType";
 import { MapPlayer } from "w3ts";
 import { Orb, OrbConfig } from "./Orb";
 

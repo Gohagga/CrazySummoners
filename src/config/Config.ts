@@ -1,10 +1,22 @@
-import { OrbType } from "content/orbs/OrbType";
+import { OrbType } from "content/constants/OrbType";
+import { BlessAbilityData } from "content/spells/paladin/Bless";
+import { PurgeAbilityData } from "content/spells/paladin/Purge";
+import { RejuvenateAbilityData } from "content/spells/paladin/Rejuvenation";
+import { SummonMeleeAbilityData } from "content/spells/paladin/SummonMelee";
+import { Coords } from "systems/coords/Coords";
+import { GameStateManagerConfig } from "systems/game-state/GameStateManager";
 import { HeroDefinition, HeroManagerConfig } from "systems/hero-manager/HeroManager";
+import { MinionFactoryConfig } from "systems/minion-factory/MinionFactory";
+import { MinionSummoningServiceConfig } from "systems/minion-summoning/MinionSummoningService";
 import { OrbConfig } from "systems/orb-resource-bar/Orb";
+import { ResourceBarManagerConfig } from "systems/orb-resource-bar/ResourceBarManager";
+import { TextRendererFactoryConfig } from "systems/text-renderer/TextRendererFactory";
 import { OrbViewModelConfig } from "ui/orbs/view-models/OrbViewModel";
 import { IOrbViewConfig } from "ui/orbs/views/OrbsView";
-import { HeroClass } from "./HeroClass";
-import { RequirementType as Req } from "./RequirementType";
+import { CameraSetup } from "w3ts";
+import { OrderId } from "w3ts/globals/order";
+import { HeroClass } from "../content/constants/HeroClass";
+import { RequirementType as Req } from '../content/constants/RequirementType'
 
 const iconPath = "ReplaceableTextures/CommandButtons";
 
@@ -62,6 +74,31 @@ export class Config {
     }
 
     //#endregion
+
+    gameStateManager: GameStateManagerConfig = {
+        balanceSetChoices: {
+            "balance1": { text: 'Balance 1', hotkey: 1 },
+            "balance2": { text: 'Balance 2', hotkey: 2 },
+        },
+        unitBalanceSetChoices: {
+            "balance1": { text: 'Balance 1', hotkey: 1 },
+            "balance2": { text: 'Balance 2', hotkey: 2 },
+        },
+        mapChoices: {
+            "map1": {
+                teamStartingPosition: { 0: Coords.fromWc3Unit(gg_unit_h01L_0017) , 1: Coords.fromWc3Unit(gg_unit_h01L_0018) },
+                teamCamera: { 0: CameraSetup.fromHandle(gg_cam_GameCameraH1), 1: CameraSetup.fromHandle(gg_cam_GameCameraH2) },
+            },
+            "map2": {
+                teamStartingPosition: { 0: Coords.fromWc3Unit(gg_unit_h01L_0017) , 1: Coords.fromWc3Unit(gg_unit_h01L_0018) },
+                teamCamera: { 0: CameraSetup.fromHandle(gg_cam_GameCameraH1), 1: CameraSetup.fromHandle(gg_cam_GameCameraH2) },
+            },
+        },
+        teamDamageRegion: {
+            0: [gg_rct_Red_Damage_Line],
+            1: [gg_rct_Blue_Damage_Line],
+        }
+    }
 
     heroManagerConfig: HeroManagerConfig<HeroClass> = {
         heroShopUnitTypeCode: 'e000',
@@ -153,4 +190,301 @@ export class Config {
         ['Dark Arts Unholy']:   ['R01B', [Req.DarkArtUnholy]],
         ['Dark Arts Necro']:    ['R019', [Req.DarkArtNecromancy]],
     }
+
+    textRenderer: TextRendererFactoryConfig = {
+        colors: {
+            "r": "|cffff8080",
+            "lb": "|cff80ffff",
+            "acc": "|cffffd9b3",
+            "b": "|cff8a8aff",
+            "chill": "|cff00cac5",
+            "red": "|cffff6c6c",
+            "blu": "|cff8a8aff",
+        },
+        keywords: {
+        }
+    }
+
+    minionSummoning: MinionSummoningServiceConfig = {
+        summoningCrystals: [
+            {
+                unit: gg_unit_h001_0015,
+                region: gg_rct_CrystalRedA1,
+                limit: 8,
+                destination: gg_unit_h002_0013,
+            }, {
+                unit: gg_unit_h001_0004,
+                region: gg_rct_CrystalRedA2,
+                limit: 8,
+                destination: gg_unit_h002_0012,
+            }, {
+                unit: gg_unit_h001_0006,
+                region: gg_rct_CrystalRedA3,
+                limit: 8,
+                destination: gg_unit_h002_0011,
+            }, {
+                unit: gg_unit_h001_0008,
+                region: gg_rct_CrystalRedA4,
+                limit: 8,
+                destination: gg_unit_h002_0010,
+            }, {
+                unit: gg_unit_h001_0014,
+                region: gg_rct_CrystalRedA5,
+                limit: 8,
+                destination: gg_unit_h002_0009,
+            },
+            
+            {
+                unit: gg_unit_h002_0013,
+                region: gg_rct_CrystalBlueA1,
+                limit: 8,
+                destination: gg_unit_h001_0015,
+            }, {
+                unit: gg_unit_h002_0012,
+                region: gg_rct_CrystalBlueA2,
+                limit: 8,
+                destination: gg_unit_h001_0004,
+            }, {
+                unit: gg_unit_h002_0011,
+                region: gg_rct_CrystalBlueA3,
+                limit: 8,
+                destination: gg_unit_h001_0006,
+            }, {
+                unit: gg_unit_h002_0010,
+                region: gg_rct_CrystalBlueA4,
+                limit: 8,
+                destination: gg_unit_h002_0010,
+            }, {
+                unit: gg_unit_h002_0009,
+                region: gg_rct_CrystalBlueA5,
+                limit: 8,
+                destination: gg_unit_h001_0014,
+            }
+        ]
+    }
+
+    resourceBarManager: ResourceBarManagerConfig = {
+        gameBalance: {
+            'balance1': {
+                coloredOrbCooldown: 25,
+                summoningOrbCooldown: 25,
+            }
+        }
+    }
+
+    minionFactory: MinionFactoryConfig = {
+        gameBalance: {
+            'balance1': {
+                maxLevel: 10,
+                maxEffectiveHp: 2500,
+                maxToMinRelativeValue: 25/15,
+                minEffectiveHp: 250,
+                secondsToDie: 25,
+            }
+        },
+        unitBalance: {
+            'balance1': {
+                unitTypeStatWeight: {
+                    'hF00': {
+                        attack: {
+                            diceTweaks: [13, 23, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.5,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.02,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.5,
+                        offenseRatio: 0.5,
+                    },
+                    'hF01': {
+                        attack: {
+                            diceTweaks: [13, 23, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.5,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.02,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.5,
+                        offenseRatio: 0.5,
+                    },
+                    'hF02': {
+                        attack: {
+                            diceTweaks: [13, 23, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.5,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.02,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.5,
+                        offenseRatio: 0.5,
+                    },
+                    'hF03': {
+                        attack: {
+                            diceTweaks: [13, 23, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.5,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.02,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.5,
+                        offenseRatio: 0.5,
+                    },
+                    'hF04': {
+                        attack: {
+                            diceTweaks: [13, 23, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.5,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.02,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.5,
+                        offenseRatio: 0.5,
+                    },
+                    'hF05': {
+                        attack: {
+                            diceTweaks: [13, 23, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.5,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.02,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.5,
+                        offenseRatio: 0.5,
+                    },
+                    'hF06': {
+                        attack: {
+                            diceTweaks: [13, 23, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.5,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.02,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.5,
+                        offenseRatio: 0.5,
+                    },
+                    'hF07': {
+                        attack: {
+                            diceTweaks: [13, 23, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.5,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.02,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.5,
+                        offenseRatio: 0.5,
+                    },
+                    'hF08': {
+                        attack: {
+                            diceTweaks: [13, 23, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.5,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.02,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.5,
+                        offenseRatio: 0.5,
+                    },
+                    'hF09': {
+                        attack: {
+                            diceTweaks: [13, 23, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.5,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.02,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.5,
+                        offenseRatio: 0.5,
+                    },
+                }
+            }
+        }
+    }
+
+    //#region Spells
+
+    bless: BlessAbilityData = {
+        abilityCode: 'AP02',
+        orderId: OrderId.Flamestrike,
+        orbCost: [OrbType.White, OrbType.White, OrbType.Red],
+        name: '|cffffff80Bless|r - 1',
+        tooltip: '',
+    }
+
+    rejuvenate: RejuvenateAbilityData = {
+        abilityCode: 'AP01',
+        orderId: OrderId.Rejuvination,
+        orbCost: [OrbType.White, OrbType.White, OrbType.White],
+        name: '|cffffff80Rejuvenate|r - 1',
+        tooltip: '',
+    }
+
+    purge: PurgeAbilityData = {
+        abilityCode: 'AP03',
+        orderId: OrderId.Rejuvination,
+        orbCost: [OrbType.White, OrbType.White, OrbType.White],
+        name: '|cffffff80Rejuvenate|r - 1',
+        tooltip: '',
+    }
+    
+    summonMelee: SummonMeleeAbilityData = {
+        abilityCode: 'A001',
+        orderId: OrderId.Acidbomb,
+        orbCost: [OrbType.Summoning],
+        name: 'Summon Melee',
+        tooltip: '',
+        levelSummonedUnitTypeId: {
+            1: 'hF00',
+            2: 'hF01',
+            3: 'hF02',
+            4: 'hF03',
+            5: 'hF04',
+            6: 'hF05',
+            7: 'hF06',
+            8: 'hF07',
+            9: 'hF08',
+            10: 'hF09',
+        }
+    }
+
+    //#endregion
 }

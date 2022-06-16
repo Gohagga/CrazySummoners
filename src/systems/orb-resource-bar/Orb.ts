@@ -1,4 +1,4 @@
-import { OrbType } from "content/orbs/OrbType";
+import { OrbType } from "content/constants/OrbType";
 import { IRequirement } from "systems/requirements/IRequirement";
 import { IOrbModel } from "ui/orbs/interfaces/IOrbModel";
 import { MapPlayer, Timer } from "w3ts";

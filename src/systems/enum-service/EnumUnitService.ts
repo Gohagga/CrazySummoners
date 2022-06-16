@@ -1,6 +1,6 @@
 import { Log } from "systems/log/Log";
 import { Destructable, Item, Rectangle, Unit } from "w3ts/index";
-import { Coords } from "../../systems/coords/Coords";
+import { Coords } from "../coords/Coords";
 import { IEnumUnitService } from "./IEnumUnitService";
 
 export class EnumUnitService implements IEnumUnitService {
@@ -96,5 +96,20 @@ export class EnumUnitService implements IEnumUnitService {
 
     EnumUnitsInLine(origin: Coords, destination: Coords, width: number, filter?: (target: Unit, caster: Unit) => boolean): Unit[] {
         return [];
+    }
+
+    EnumUnitsInRect(rect: Rectangle, filter?: (target: Unit) => boolean, outResult?: Unit[]): Unit[] {
+        if (!outResult) outResult = [];
+
+        GroupEnumUnitsInRect(this.group, rect.handle, null);
+        let u: unit | null;
+        while ((u = FirstOfGroup(this.group)) != null) {
+            GroupRemoveUnit(this.group, u);
+            let U = Unit.fromHandle(u);
+            if (!filter || filter(U)) {
+                outResult.push(U);
+            }
+        }
+        return outResult;
     }
 }
