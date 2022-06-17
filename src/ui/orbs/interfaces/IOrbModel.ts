@@ -6,4 +6,5 @@ export interface IOrbModel {
 
     onUpdate: null | (() => void);
 
+    Destroy(): void;
 }

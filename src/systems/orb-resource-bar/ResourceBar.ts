@@ -76,4 +76,20 @@ export class ResourceBar implements IResourceBarModel {
 
         return true;
     }
+
+    public ResetCooldowns(cooldown: number): void {
+        for (let orb of this._orbs) {
+            if (!orb) continue;
+
+            orb.Consume(cooldown);
+        }
+    }
+
+    public ResetOrbs(): void {
+        for (let i = 0; i < this._orbs.length; i++) {
+            let orb = this._orbs[i];
+            orb.Destroy();
+        }
+        this._orbs = [];
+    }
 }

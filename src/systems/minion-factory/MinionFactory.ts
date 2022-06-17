@@ -30,7 +30,6 @@ export class MinionFactory {
                 let unitTypeId = FourCC(unitTypeCode);
                 unitBalance.unitTypeStatWeight[unitTypeId] = weights[unitTypeCode];
             }
-            print("INIT", unitBalanceId, this.unitBalances['balance1']);
         }
 
         for (let gameBalanceId of Object.keys(config.gameBalance)) {
@@ -88,7 +87,6 @@ export class MinionFactory {
     public SetUnitBalanceSet(id: string): void {
         Log.Info("Setting unit balance", id);
         this.unitBalance = this.unitBalances[id];
-        print("balance count", this.unitBalances.length, this.unitBalance);
         this.unitTypeStats = {};
     }
 
@@ -114,7 +112,6 @@ export class MinionFactory {
         let hitPoints: number = 223;
         let armor: number = 2;
 
-        print("Stats, mindps", this.gameBalance.minDps, "dpsperlevel", this.gameBalance.dpsPerLevel);
         try {
             if (weights.attack) {
                 // Calculate attack first

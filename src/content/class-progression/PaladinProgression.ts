@@ -29,6 +29,8 @@ export class PaladinProgression extends UnitProgress {
         this.SetupSkills();
 
         let bar = this.resourceBarManager.Create(this.owner);
+        bar.AddOrb(OrbType.Summoning);
+        bar.AddOrb(OrbType.Summoning);
         bar.AddOrb(OrbType.White);
         bar.AddOrb(OrbType.White);
         bar.AddOrb(OrbType.White);

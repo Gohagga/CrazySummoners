@@ -88,16 +88,21 @@ export class Config {
             "map1": {
                 teamStartingPosition: { 0: Coords.fromWc3Unit(gg_unit_h01L_0017) , 1: Coords.fromWc3Unit(gg_unit_h01L_0018) },
                 teamCamera: { 0: CameraSetup.fromHandle(gg_cam_GameCameraH1), 1: CameraSetup.fromHandle(gg_cam_GameCameraH2) },
+                visibility: [gg_rct_PlayArea],
             },
             "map2": {
                 teamStartingPosition: { 0: Coords.fromWc3Unit(gg_unit_h01L_0017) , 1: Coords.fromWc3Unit(gg_unit_h01L_0018) },
                 teamCamera: { 0: CameraSetup.fromHandle(gg_cam_GameCameraH1), 1: CameraSetup.fromHandle(gg_cam_GameCameraH2) },
+                visibility: [gg_rct_PlayArea],
             },
         },
         teamDamageRegion: {
             0: [gg_rct_Red_Damage_Line],
             1: [gg_rct_Blue_Damage_Line],
-        }
+        },
+        playingBoard: [
+            gg_rct_Battleground
+        ]
     }
 
     heroManagerConfig: HeroManagerConfig<HeroClass> = {

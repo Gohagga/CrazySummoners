@@ -1,13 +1,14 @@
 import { Coords } from "systems/coords/Coords"
+import { IEnumUnitService } from "systems/enum-service/IEnumUnitService";
 import { IHeroManager } from "systems/hero-manager/IHeroManager"
 import { Log } from "systems/log/Log";
 import { MinionFactory } from "systems/minion-factory/MinionFactory";
 import { ResourceBarManager } from "systems/orb-resource-bar/ResourceBarManager";
 import { TeamManager } from "systems/team-manager/TeamManager";
 import { VoteDialogButtonInfo, VoteDialogService } from "systems/vote-dialog-service/VoteDialogService";
-import { Camera, CameraSetup, Dialog, MapPlayer, Rectangle, Region, Timer, Trigger, Unit } from "w3ts";
+import { Camera, CameraSetup, Dialog, FogModifier, MapPlayer, Rectangle, Region, Timer, Trigger, Unit } from "w3ts";
 
-type GameState = 'balanceDialog' | 'unitBalanceDialog' | 'mapDialog' | 'setup' | 'playing' | 'roundEnd';
+type GameState = 'balanceDialog' | 'unitBalanceDialog' | 'mapDialog' | 'setup' | 'heroSelection' | 'playing' | 'roundEnd';
 
 export interface GameStateManagerConfig {
     // First, select game balance set
@@ -19,6 +20,8 @@ export interface GameStateManagerConfig {
 
     // Damage Regions
     teamDamageRegion: Record<number, rect[]>,
+    // Minion clear regions
+    playingBoard: rect[],
 }
 
 export class GameStateManager {
@@ -27,12 +30,16 @@ export class GameStateManager {
     private readonly unitBalanceSetChoices: Record<string, { text: string, hotkey: number }>;
     private readonly mapChoices: Record<string, MapChoice>;
     private readonly teamDamageRegions: Record<number, Region> = {};
-
+    private readonly playingBoard: Rectangle[] = [];
+    private readonly unitsNotToRemove: Set<number> = new Set<number>();
+    private readonly mapPlayerFogModifier: Record<string, Record<number, FogModifier[]>> = {};
+    private readonly heroSelectorUnits: Unit[] = [];
     
     private gameState: GameState = 'balanceDialog';
     private choiceBalanceSet: string | null = null;
     private choiceUnitBalanceSet: string | null = null;
     private choiceMap: MapChoice | null = null;
+    private choiceMapId: string | null = null;
     private teamDamageTriggers: Record<number, Trigger> = {};
 
     private teamDamage: Record<number, number> = {};
@@ -44,10 +51,11 @@ export class GameStateManager {
         private readonly teamManager: TeamManager,
         private readonly resourceBarManager: ResourceBarManager,
         private readonly voteDialogService: VoteDialogService,
+        private readonly enumService: IEnumUnitService,
     ) {
         this.balanceSetChoices = config.balanceSetChoices;
         this.unitBalanceSetChoices = config.unitBalanceSetChoices;
-        this.mapChoices = config.mapChoices;
+        this.mapChoices = config.mapChoices;        
 
         let dialogChoiceTrigger = new Trigger();
 
@@ -60,13 +68,48 @@ export class GameStateManager {
             }
             this.teamDamageRegions[teamId] = region;
         }
+
+        for (let b of config.playingBoard) {
+            this.playingBoard.push(Rectangle.fromHandle(b));
+        }
         
         new Timer().start(1, false, () => {
 
             Log.Info("Entering Game State: BalanceDialog");
             this.gameState = 'balanceDialog';
+            
             this.ExecuteGameState();
+            // Timer.fromExpired().destroy();
         });
+
+        this.heroManager.OnPlayerSelected(() => {
+            if (this.gameState == 'heroSelection') this.ExecuteGameState();
+        });
+    }
+
+    private SetEnabledFogModifierForPlayer(choiceMapId: string | null, p: MapPlayer, enabled: boolean) {
+        if (!choiceMapId) return;
+
+        let mapFogmos = this.mapPlayerFogModifier[choiceMapId];
+        if (!mapFogmos) {
+            this.mapPlayerFogModifier[choiceMapId] = mapFogmos = {};
+        }
+        
+        let playerFogmos = mapFogmos[p.id];
+        if (!playerFogmos) {
+            playerFogmos = mapFogmos[p.id] = [];
+
+            let map = this.mapChoices[choiceMapId];
+            for (let rect of map.visibility) {
+                let fogmo = FogModifier.fromRect(p, FOG_OF_WAR_VISIBLE, Rectangle.fromHandle(rect), true, true);
+                playerFogmos.push(fogmo);
+            }
+        }
+        
+        for (let fogmo of playerFogmos) {
+            if (enabled) fogmo.start();
+            else fogmo.stop();
+        }
     }
 
     private ShowDialog(dialog: Dialog, show: boolean) {
@@ -80,6 +123,7 @@ export class GameStateManager {
         unitBalanceDialog: () => this.ExecuteUnitBalanceDialog(),
         mapDialog: () => this.ExecuteMapDialog(),
         setup: () => this.ExecuteSetup(),
+        heroSelection: () => this.ExecuteHeroSelection(),
         playing: () => this.ExecutePlaying(),
         roundEnd: () => this.ExecuteRoundEnd(),
     }
@@ -94,7 +138,6 @@ export class GameStateManager {
         if (this.choiceBalanceSet == null) {
             if (this.balanceDialog == null) {
                 this.balanceDialog = new Dialog();
-                this.balanceDialog.setMessage("Choose Game Balance Set");
                 for (let k of Object.keys(this.unitBalanceSetChoices)) {
                     let choice = this.unitBalanceSetChoices[k];
                     let button = this.balanceDialog.addButton(choice.text, choice.hotkey, false, false);
@@ -109,6 +152,7 @@ export class GameStateManager {
                 }
             }
 
+            this.balanceDialog.setMessage("Choose Game Balance Set");
             this.ShowDialog(this.balanceDialog, true);
             return;
         }
@@ -119,6 +163,7 @@ export class GameStateManager {
 
         this.gameState = 'unitBalanceDialog';
         Log.Info("Entering Game State: UnitBalanceDialog");
+        Log.Message("Game balance chosen: " + this.choiceBalanceSet);
         this.ExecuteGameState();
 
         // Reset balance choice
@@ -154,6 +199,7 @@ export class GameStateManager {
 
         this.gameState = "mapDialog";
         Log.Info("Entering Game State: MapDialog");
+        Log.Message("Unit balance chosen: " + this.choiceUnitBalanceSet);
         this.ExecuteGameState();
 
         // Reset balance choice
@@ -171,21 +217,23 @@ export class GameStateManager {
             }
             if (this.mapDialog == null) {
                 this.mapDialog = new Dialog();
-                this.mapDialog.setMessage("Choose Map");
                 for (let k of Object.keys(this.mapChoices)) {
-                    let choice = this.mapChoices[k];
+                    let mapId = k;
+                    let choice = this.mapChoices[mapId];
                     let button = this.mapDialog.addButton(k, undefined, false, false);
 
                     let mapChoice = choice;
                     let t = new Trigger();
                     t.registerDialogButtonEvent(button);
                     t.addAction(() => {
+                        this.choiceMapId = mapId;
                         this.choiceMap = mapChoice;
-                        this.ExecuteGameState();
+                    this.ExecuteGameState();
                     });
                 }
             }
 
+            this.mapDialog.setMessage("Choose Map");
             this.ShowDialog(this.mapDialog, true);
             return;
         }
@@ -195,6 +243,7 @@ export class GameStateManager {
         
         this.gameState = "setup";
         Log.Info("Entering Game State: Setup");
+        Log.Message("Map chosen: " + this.choiceMapId);
         this.ExecuteGameState();
 
         // Reset balance choice
@@ -204,16 +253,27 @@ export class GameStateManager {
     ExecuteSetup(): void {
         if (!this.choiceMap) return;
 
+        // Saving the units not to remove on board reset
+        this.unitsNotToRemove.clear();
+        let unitsInPlayArea: Unit[] = [];
+        for (let rect of this.playingBoard) {
+            this.enumService.EnumUnitsInRect(rect, undefined, unitsInPlayArea);
+        }
+        for (let u of unitsInPlayArea) {
+            this.unitsNotToRemove.add(u.id);
+        }
+
         for (let team of this.teamManager.teams) {
             let loc = this.choiceMap.teamStartingPosition[team.id];
             const heroShop = this.heroManager.CreateHeroShop(loc, team.teamOwner);
+            this.heroSelectorUnits.push(heroShop);
 
             let camera = this.choiceMap.teamCamera[team.id];
             for (let p of team.teamMembers) {
                 if (p.isLocal()) {
-                    print("Setting camera", team.id, p.id, camera.id);
                     camera.applyForceDuration(true, 0.05);
                 }
+                this.SetEnabledFogModifierForPlayer(this.choiceMapId, p, true);
                 ClearSelectionForPlayer(p.handle);
                 SelectUnitForPlayerSingle(heroShop.handle, p.handle);
             }
@@ -222,20 +282,18 @@ export class GameStateManager {
         this.teamDamage = {};
         for (let t of this.teamManager.teams) {
         
-            print("Team", t.id);
             let team = t; // Need for closure
             this.teamDamage[team.id] = 0;
             if (this.teamDamageTriggers[team.id]) this.teamDamageTriggers[team.id].destroy();
             
-            print("Registering damage region event", this.teamDamageRegions[team.id].id);
             let trg = new Trigger();
             trg.registerEnterRegion(this.teamDamageRegions[team.id].handle, null);
             trg.addAction(() => {
 
+                if (this.gameState != 'playing') return;
+                
                 let unit = Unit.fromEvent();
-                print("Unit entering damage area");
                 this.teamDamage[team.id]++;
-                print("Team damage", this.teamDamage[team.id]);
                 this.ExecuteGameState();
                 
                 unit.destroy();
@@ -244,9 +302,69 @@ export class GameStateManager {
             this.teamDamageTriggers[team.id] = trg;
         }
 
-        this.gameState = 'playing';
+        Log.Info("Entering Game State: HeroSelection");
+        this.gameState = 'heroSelection';
+        // this.ExecuteGameState();
     }
 
+    ExecuteHeroSelection(): void {
+
+        // Check if all heroes have chosen
+        for (let p of this.teamManager.players) {
+            if (p.slotState != PLAYER_SLOT_STATE_PLAYING || p.controller != MAP_CONTROL_USER) continue;
+
+            let hero = this.heroManager.GetPlayerHero(p);
+            if (!hero) return;
+        }
+
+        // All heroes have been selected
+        Log.Info("All heroes have been selected.");
+        let countdown = 5;
+        
+        // Reset resource bars
+        for (let p of this.teamManager.players) {
+            this.resourceBarManager.Get(p.id).ResetCooldowns(countdown);
+        }
+
+        // Remove hero selectors
+        for (let hs of this.heroSelectorUnits) {
+            hs.destroy();
+        }
+
+        new Timer().start(1, true, () => {
+
+            countdown--;
+            Log.Message(countdown + "...");
+            if (countdown == 0) {
+                Timer.fromExpired().destroy();
+
+                Log.Info("Entering Game State: Playing");
+                Log.Message("Battle!");
+                this.gameState = 'playing';
+                // It will be executed when minion enters damage area
+                // this.ExecuteGameState();
+
+                // Reset board
+                let unitsInPlayArea: Unit[] = [];
+                for (let rect of this.playingBoard) {
+                    this.enumService.EnumUnitsInRect(rect, u =>
+                        this.unitsNotToRemove.has(u.id) == false, unitsInPlayArea);
+                }
+                for (let u of unitsInPlayArea) {
+                    u.destroy();
+                }
+
+                // Reset player mana/hp
+                for (let p of this.teamManager.players) {
+                    let hero = this.heroManager.GetPlayerHero(p);
+                    if (!hero) continue;
+                    hero.life = hero.maxLife;
+                    hero.mana = 0;
+                }
+            }
+        });
+    }
+    
     ExecutePlaying(): void {
 
         Log.Info("Execute Game State: Playing");
@@ -254,7 +372,6 @@ export class GameStateManager {
         for (let team of this.teamManager.teams) {
 
             let damage = this.teamDamage[team.id];
-            print("Damage?", damage);
             
             let totalHp = 0;
             for (let member of team.teamMembers) {
@@ -285,9 +402,19 @@ export class GameStateManager {
             // Remove all heroes
             for (let team of this.teamManager.teams) {
                 for (let member of team.teamMembers) {    
-                    let hero = this.heroManager.GetPlayerHero(member);
-                    if (hero) hero.destroy();                    
+                    this.heroManager.RemoveHero(member);
+                    this.SetEnabledFogModifierForPlayer(this.choiceMapId, member, false);
                 }
+            }
+
+            // Reset board
+            let unitsInPlayArea: Unit[] = [];
+            for (let rect of this.playingBoard) {
+                this.enumService.EnumUnitsInRect(rect, u =>
+                    this.unitsNotToRemove.has(u.id) == false, unitsInPlayArea);
+            }
+            for (let u of unitsInPlayArea) {
+                u.destroy();
             }
 
             this.gameState = 'balanceDialog';
@@ -299,5 +426,6 @@ export class GameStateManager {
 
 export type MapChoice = {
     teamStartingPosition: Record<number, Coords>,
-    teamCamera: Record<number, CameraSetup>
+    teamCamera: Record<number, CameraSetup>,
+    visibility: rect[],
 }

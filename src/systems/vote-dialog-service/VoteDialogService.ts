@@ -87,9 +87,7 @@ export class VoteDialogService {
             }
         }
 
-        print("Result index", highestIndex);
         let result = voteDialog.buttons[highestIndex].value;
-        print("Result", result);
         voteDialog.onResult(result);
 
         for (let p of voteDialog.players) {

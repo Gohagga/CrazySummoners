@@ -31,11 +31,12 @@ import { AbilityEventHandler } from "systems/ability-events/AbilityEventHandler"
 import { AbilityEventProvider } from "systems/ability-events/AbilityEventProvider";
 import { InterruptableService } from "systems/interruptable/InterruptableService";
 import { MinionAiManager } from "systems/minion-ai/MinionAiManager";
-// import { MinionAiManager } from "systems/minion-ai/MinionAiManager";
+import { Level, Log } from "systems/log/Log";
 
 export function initializeGame() {
 
     let config = new Config();
+    Log.Level = Level.Error;
 
     const players: MapPlayer[] = [
         MapPlayer.fromIndex(0)
@@ -115,11 +116,11 @@ export function initializeGame() {
         [HeroClass.DeathKnight]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager),
     });
     
-    const gameStateManager = new GameStateManager(config.gameStateManager, heroManager, minionFactory, teamManager, resourceBarManager, voteDialogService);
+    const gameStateManager = new GameStateManager(config.gameStateManager, heroManager, minionFactory, teamManager, resourceBarManager, voteDialogService, enumService);
 
     // UI
     let orbsView = GenerateOrbView(config.orbView, Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0));
-
+    
     // Test
     {
         let orbVm: OrbViewModel[] = [];
@@ -130,6 +131,9 @@ export function initializeGame() {
         let rbVm = new ResourceBarViewModel(MapPlayer.fromIndex(0), orbsView, i =>
             new OrbViewModel(config.orbViewModelConfig, MapPlayer.fromIndex(0), orbsView.orbs[i]));
     
+        resourceBarManager.OnCreate((owner, bar) => {
+            rbVm.resourceBar = bar;
+        });
         // let redResourceBar = rbVm.resourceBar = resourceBarManager.Get(0);
     
         // let orb = redResourceBar.AddOrb(OrbType.Blue);
@@ -140,13 +144,13 @@ export function initializeGame() {
         //     redResourceBar.Consume([OrbType.Blue, OrbType.Red])
         // });
     
-        let x = true;
-        new Timer().start(4, true, () => {
-            let redResourceBar = rbVm.resourceBar = resourceBarManager.Get(0);
-            if (x) redResourceBar.AddOrb(OrbType.Summoning);
-            // else redResourceBar.AddOrb(<OrbType>(math.floor(math.random(0, 4))));
-            else redResourceBar.AddOrb(<OrbType>(math.floor(math.random(0, 1) + 0.5)*2));
-            x = !x;
-        });
+        // let x = true;
+        // new Timer().start(4, true, () => {
+        //     let redResourceBar = rbVm.resourceBar = resourceBarManager.Get(0);
+        //     if (x) redResourceBar.AddOrb(OrbType.Summoning);
+        //     // else redResourceBar.AddOrb(<OrbType>(math.floor(math.random(0, 4))));
+        //     else redResourceBar.AddOrb(<OrbType>(math.floor(math.random(0, 1) + 0.5)*2));
+        //     x = !x;
+        // });
     }
 }

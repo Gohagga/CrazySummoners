@@ -32,10 +32,16 @@ export class ResourceBarManager {
     public Create(player: MapPlayer): ResourceBar {
         const playerId = player.id;
 
-        if (!this.instances[playerId])
-            this.instances[playerId] = new ResourceBar(player, this.orbFactory, this.gameBalance);
+        if (this.instances[playerId]) {    
+            this.instances[playerId].ResetOrbs();
+        }
+        this.instances[playerId] = new ResourceBar(player, this.orbFactory, this.gameBalance);
 
         // Orb View register
+        for (let c of this.onCreate) {
+            c(player, this.instances[playerId]);
+        }
+
         return this.instances[playerId];
     }
 
@@ -43,5 +49,10 @@ export class ResourceBarManager {
         let rb = this.instances[playerId];
         if (!rb) return this.Create(MapPlayer.fromIndex(playerId));
         return rb;
+    }
+
+    private readonly onCreate: ((owner: MapPlayer, resourceBar: ResourceBar) => void)[] = [];
+    public OnCreate(action: (owner: MapPlayer, resourceBar: ResourceBar) => void) {
+        this.onCreate.push(action);
     }
 }

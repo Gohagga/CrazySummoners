@@ -21,10 +21,12 @@ export type HeroTemplate<HeroClass> = HeroDefinition & {
 
 export class HeroManager<HeroClass extends number> implements IHeroManager {
 
-    public readonly playerHero: Map<number, Unit> = new Map<number, Unit>();
+    public readonly playerHero: Record<number, Unit> = {};
     public readonly unitTypeDef: Record<number, HeroTemplate<HeroClass>> = {};
 
     private readonly heroShopUnitTypeId: number;
+
+    private readonly onHeroSelected: (() => void)[] = [];
     
     constructor(
         config: HeroManagerConfig<HeroClass>,
@@ -50,12 +52,30 @@ export class HeroManager<HeroClass extends number> implements IHeroManager {
     }
 
     public GetPlayerHero(owner: MapPlayer): Unit | null {
-        return this.playerHero.get(owner.id) || null;
+        let hero = this.playerHero[owner.id];
+        if (!hero || !hero.handle) {
+            delete this.playerHero[owner.id];
+            return null;
+        }
+
+        return hero;
+    }
+
+    public RemoveHero(owner: MapPlayer): void {
+        let hero = this.playerHero[owner.id];
+        if (hero && hero.handle) {
+            hero.destroy();
+        }
+        delete this.playerHero[owner.id];
     }
 
     public CreateHeroShop(location: Coords, owner: MapPlayer) {
         const heroShop = new Unit(owner, this.heroShopUnitTypeId, location.x, location.y, 0);
         return heroShop;
+    }
+
+    public OnPlayerSelected(action: () => void) {
+        this.onHeroSelected.push(action);
     }
 
     private OnUnitSold() {
@@ -75,11 +95,17 @@ export class HeroManager<HeroClass extends number> implements IHeroManager {
             playerClass = this.heroProgressFactory[config.heroClass](sold);
             playerClass.Start();
             
-            this.playerHero.set(playerId, sold);
+            this.playerHero[playerId] = sold;
             SelectUnitForPlayerSingle(sold.handle, owner.handle);
             // TODO: Remove this
             sold.setHeroLevel(20, true);
 
+            Log.Message(owner.name + " has selected " + sold.name + "!");
+
+            // Trigger events
+            for (let e of this.onHeroSelected) {
+                e();
+            }
         } catch (ex: any) {
             Log.Error(ex);
         }

@@ -56,7 +56,6 @@ export class MinionSummoningService {
         let out: Unit[] = [];
         this.enumService.EnumUnitsInRect(crystal.region, undefined, out);
 
-        print("crystal limit", crystal.limit, out.length + units.length);
         if (crystal.limit && out.length + units.length > crystal.limit)
             return false;
 

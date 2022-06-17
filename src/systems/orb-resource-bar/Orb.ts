@@ -1,4 +1,5 @@
 import { OrbType } from "content/constants/OrbType";
+import { Log } from "systems/log/Log";
 import { IRequirement } from "systems/requirements/IRequirement";
 import { IOrbModel } from "ui/orbs/interfaces/IOrbModel";
 import { MapPlayer, Timer } from "w3ts";
@@ -27,12 +28,10 @@ export class Orb implements IOrbModel {
     ) {
         this.orbTypeRequirements = config.requirements;
         this._orbTypeId = orbTypeId;
-        print("Creating orb of type", orbTypeId);
         this.requirement.Increase(this.owner, 1);
     }
 
     private get requirement(): IRequirement {
-        // print("Get Requirement", this._orbTypeId);
         return this.orbTypeRequirements[this._orbTypeId];
     }
 
@@ -42,7 +41,7 @@ export class Orb implements IOrbModel {
 
     public set orbTypeId(v: OrbType) {
         
-        print("Set orbtypeid", this._orbTypeId, "to", v);
+        Log.Info("Set orbtypeid", this._orbTypeId, "to", v);
         let req = this.requirement;
         
         if (req.Get(this.owner) > 0)
@@ -68,6 +67,15 @@ export class Orb implements IOrbModel {
             }
             this.onUpdate();
         });
+    }
+
+    public Destroy() {
+        
+        this.timer.destroy();
+        if (this.isAvailable == true) {
+            this.requirement.Decrease(this.owner, 1);
+        }
+        this.onUpdate();
     }
 }
 //     public type: OrbType;
