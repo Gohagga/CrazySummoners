@@ -1,15 +1,18 @@
 import { OrbType } from "content/constants/OrbType";
+import { ArcaneTomeShopConfig } from "content/shop/ArcaneTomeShop";
 import { BlessAbilityData } from "content/spells/paladin/Bless";
 import { PurgeAbilityData } from "content/spells/paladin/Purge";
 import { RejuvenateAbilityData } from "content/spells/paladin/Rejuvenation";
 import { SummonMeleeAbilityData } from "content/spells/paladin/SummonMelee";
 import { Coords } from "systems/coords/Coords";
+import { DummyUnitManagerConfig } from "systems/dummies/DummyUnitManager";
 import { GameStateManagerConfig } from "systems/game-state/GameStateManager";
 import { HeroDefinition, HeroManagerConfig } from "systems/hero-manager/HeroManager";
 import { MinionFactoryConfig } from "systems/minion-factory/MinionFactory";
 import { MinionSummoningServiceConfig } from "systems/minion-summoning/MinionSummoningService";
 import { OrbConfig } from "systems/orb-resource-bar/Orb";
 import { ResourceBarManagerConfig } from "systems/orb-resource-bar/ResourceBarManager";
+import { SpellcastingServiceConfig } from "systems/progress-bars/SpellcastingService";
 import { TextRendererFactoryConfig } from "systems/text-renderer/TextRendererFactory";
 import { OrbViewModelConfig } from "ui/orbs/view-models/OrbViewModel";
 import { IOrbViewConfig } from "ui/orbs/views/OrbsView";
@@ -89,11 +92,13 @@ export class Config {
                 teamStartingPosition: { 0: Coords.fromWc3Unit(gg_unit_h01L_0017) , 1: Coords.fromWc3Unit(gg_unit_h01L_0018) },
                 teamCamera: { 0: CameraSetup.fromHandle(gg_cam_GameCameraH1), 1: CameraSetup.fromHandle(gg_cam_GameCameraH2) },
                 visibility: [gg_rct_PlayArea],
+                playArea: gg_rct_Battleground,
             },
             "map2": {
                 teamStartingPosition: { 0: Coords.fromWc3Unit(gg_unit_h01L_0017) , 1: Coords.fromWc3Unit(gg_unit_h01L_0018) },
                 teamCamera: { 0: CameraSetup.fromHandle(gg_cam_GameCameraH1), 1: CameraSetup.fromHandle(gg_cam_GameCameraH2) },
                 visibility: [gg_rct_PlayArea],
+                playArea: gg_rct_Battleground,
             },
         },
         teamDamageRegion: {
@@ -210,6 +215,19 @@ export class Config {
         }
     }
 
+    spellcastingService: SpellcastingServiceConfig = {
+        defaultHeight: 250,
+        model: 'Progressbar_01.mdx',
+        queueTreshold: 0.5,
+        size: 2.5,
+        updatePeriod: 0.03,
+    }
+
+    dummyUnitManager: DummyUnitManagerConfig = {
+        dummyUnitCodeId: 'nDUM',
+        dummyUnitOwnerPlayerId: PLAYER_NEUTRAL_PASSIVE
+    }
+
     minionSummoning: MinionSummoningServiceConfig = {
         summoningCrystals: [
             {
@@ -273,6 +291,8 @@ export class Config {
             'balance1': {
                 coloredOrbCooldown: 25,
                 summoningOrbCooldown: 25,
+                coloredMaxCount: 12,
+                summoningMaxCount: 6,
             }
         }
     }
@@ -453,6 +473,11 @@ export class Config {
         orbCost: [OrbType.White, OrbType.White, OrbType.Red],
         name: '|cffffff80Bless|r - 1',
         tooltip: '',
+        castSfx: 'DeterminationCastAnimMajor.mdl',
+        dummyBless: {
+            orderId: OrderId.Innerfire,
+            spellCodeId: 'A007'
+        }
     }
 
     rejuvenate: RejuvenateAbilityData = {
@@ -490,6 +515,16 @@ export class Config {
             10: 'hF09',
         }
     }
-
+    
     //#endregion
+
+    arcaneTomeShop: ArcaneTomeShopConfig = {
+        soldItemCodeGainedOrbType: {
+            'IB0B': OrbType.Blue,
+            'IB0R': OrbType.Red,
+            'IB0W': OrbType.White,
+            'IB0P': OrbType.Purple,
+            'IB0S': OrbType.Summoning,
+        }
+    };
 }

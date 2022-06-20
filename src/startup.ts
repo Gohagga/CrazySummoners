@@ -32,6 +32,10 @@ import { AbilityEventProvider } from "systems/ability-events/AbilityEventProvide
 import { InterruptableService } from "systems/interruptable/InterruptableService";
 import { MinionAiManager } from "systems/minion-ai/MinionAiManager";
 import { Level, Log } from "systems/log/Log";
+import { ArcaneTomeShop } from "content/shop/ArcaneTomeShop";
+import { SpellcastingService } from "systems/progress-bars/SpellcastingService";
+import { DummyAbilityFactory } from "systems/dummies/DummyAbilityFactory";
+import { DummyUnitManager } from "systems/dummies/DummyUnitManager";
 
 export function initializeGame() {
 
@@ -95,18 +99,24 @@ export function initializeGame() {
     const resourceBarManager = new ResourceBarManager(orbFactory, config.resourceBarManager);
     const teamManager = new TeamManager(players, teams);
     const skillManager = new SkillManager();
+    const dummyUnitManager = new DummyUnitManager(config.dummyUnitManager);
     
     const minionSummoningService = new MinionSummoningService(config.minionSummoning, minionFactory, enumService, teamManager, new MinionAiManager());
+    const spellcastingService = new SpellcastingService(config.spellcastingService, interruptableService);
+    const dummyAbilityFactory = new DummyAbilityFactory(dummyUnitManager);
 
     //#region Spells
     const abl = {
         rejuvenate: new Rejuvenate(config.rejuvenate),
-        bless: new Bless(config.bless),
+        bless: new Bless(config.bless, abilityEventHandler, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory),
         purge: new Purge(config.purge),
         
         summonMelee: new SummonMelee(config.summonMelee, abilityEventHandler, minionSummoningService, resourceBarManager),
     }
     //#endregion
+
+    // Shop
+    const arcaneTomeShop = new ArcaneTomeShop(config.arcaneTomeShop, resourceBarManager);
 
     const heroManager = new HeroManager<HeroClass>(config.heroManagerConfig, {
         [HeroClass.Paladin]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager),
@@ -134,6 +144,8 @@ export function initializeGame() {
         resourceBarManager.OnCreate((owner, bar) => {
             rbVm.resourceBar = bar;
         });
+
+        MapPlayer.fromIndex(0).setState(PLAYER_STATE_RESOURCE_LUMBER, 20);
         // let redResourceBar = rbVm.resourceBar = resourceBarManager.Get(0);
     
         // let orb = redResourceBar.AddOrb(OrbType.Blue);
@@ -152,5 +164,14 @@ export function initializeGame() {
         //     else redResourceBar.AddOrb(<OrbType>(math.floor(math.random(0, 1) + 0.5)*2));
         //     x = !x;
         // });
+    }
+
+    // Cleanup
+    {
+        let cleanupUnits = enumService.EnumUnitsInRect(Rectangle.getWorldBounds(), t => t.typeId == FourCC('h01L'));
+        for (let u of cleanupUnits) {
+            print(u.name);
+            u.destroy();
+        }
     }
 }

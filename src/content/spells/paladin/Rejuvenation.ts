@@ -43,6 +43,9 @@ export class Rejuvenate extends OrbAbility {
     UpdateUnitSkill(unit: Unit): void {
 
         let data = this.GetUnitConfig(unit);
+        let lvl = unit.getAbilityLevel(this.id);
+        let name = this.name + ' - ' + lvl;
+
         let healPercent = string.format('%.1f', data.healPercent * 100);
         let channelTime = string.format('%.1f', data.channelTime);
         let tooltip =
@@ -50,6 +53,6 @@ export class Rejuvenate extends OrbAbility {
 
 #acc:Channel time: ${channelTime} sec:#`;
 
-        this.UpdateUnitAbilityBase(unit, tooltip);
+        this.UpdateUnitAbilityBase(unit, tooltip, undefined, undefined, name);
     }
 }

@@ -28,6 +28,7 @@ gg_cam_GameCamera_Blue = nil
 gg_cam_GameCameraH1 = nil
 gg_cam_GameCameraH2 = nil
 gg_trg_Melee_Initialization = nil
+gg_trg_Untitled_Trigger_001 = nil
 gg_trg_After_Start_Copy = nil
 gg_unit_h001_0004 = nil
 gg_unit_nDUM_0033 = nil
@@ -47,7 +48,6 @@ gg_unit_h001_0006 = nil
 gg_unit_e001_0016 = nil
 gg_unit_h01L_0017 = nil
 gg_unit_h01L_0018 = nil
-gg_trg_Untitled_Trigger_001 = nil
 function InitGlobals()
 end
 
@@ -117,6 +117,16 @@ function CreateBuildingsForPlayer9()
     SetUnitColor(gg_unit_h002_0013, ConvertPlayerColor(1))
 end
 
+function CreateUnitsForPlayer9()
+    local p = Player(9)
+    local u
+    local unitID
+    local t
+    local life
+    u = BlzCreateUnitWithSkin(p, FourCC("hF01"), -3977.7, -3616.7, 106.549, FourCC("hF01"))
+    u = BlzCreateUnitWithSkin(p, FourCC("hF01"), -4072.5, -3586.8, 356.693, FourCC("hF01"))
+end
+
 function CreateNeutralHostileBuildings()
     local p = Player(PLAYER_NEUTRAL_AGGRESSIVE)
     local u
@@ -150,6 +160,7 @@ end
 
 function CreatePlayerUnits()
     CreateUnitsForPlayer0()
+    CreateUnitsForPlayer9()
 end
 
 function CreateAllUnits()

@@ -15,6 +15,8 @@ export class ResourceBarManager {
     private gameBalance: ResourceBarConfig = {
         coloredOrbCooldown: 20,
         summoningOrbCooldown: 20,
+        coloredMaxCount: 12,
+        summoningMaxCount: 6,
     }
 
     constructor(

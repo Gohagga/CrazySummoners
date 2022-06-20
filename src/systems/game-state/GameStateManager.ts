@@ -263,6 +263,10 @@ export class GameStateManager {
             this.unitsNotToRemove.add(u.id);
         }
 
+        // Binding camera to play area
+        SetCameraBoundsToRect(this.choiceMap.playArea);
+
+        // Creating hero shop
         for (let team of this.teamManager.teams) {
             let loc = this.choiceMap.teamStartingPosition[team.id];
             const heroShop = this.heroManager.CreateHeroShop(loc, team.teamOwner);
@@ -278,7 +282,7 @@ export class GameStateManager {
                 SelectUnitForPlayerSingle(heroShop.handle, p.handle);
             }
         }
-        
+
         this.teamDamage = {};
         for (let t of this.teamManager.teams) {
         
@@ -293,6 +297,9 @@ export class GameStateManager {
                 if (this.gameState != 'playing') return;
                 
                 let unit = Unit.fromEvent();
+
+                if (!unit.isEnemy(t.teamOwner)) return;
+
                 this.teamDamage[team.id]++;
                 this.ExecuteGameState();
                 
@@ -404,6 +411,7 @@ export class GameStateManager {
                 for (let member of team.teamMembers) {    
                     this.heroManager.RemoveHero(member);
                     this.SetEnabledFogModifierForPlayer(this.choiceMapId, member, false);
+                    this.resourceBarManager.Get(member.id).ResetOrbs();
                 }
             }
 
@@ -428,4 +436,5 @@ export type MapChoice = {
     teamStartingPosition: Record<number, Coords>,
     teamCamera: Record<number, CameraSetup>,
     visibility: rect[],
+    playArea: rect,
 }

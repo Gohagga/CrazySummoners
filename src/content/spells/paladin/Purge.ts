@@ -40,12 +40,15 @@ export class Purge extends OrbAbility {
     UpdateUnitSkill(unit: Unit): void {
 
         let data = this.GetUnitConfig(unit);
-        let channelTime = string.format('%.1f', data.castTime);
+        let lvl = unit.getAbilityLevel(this.id);
+        let name = this.name + ' - ' + lvl;
+
+        let castTime = string.format('%.1f', data.castTime);
         let tooltip =
 `Removes effects in a target area and deals ${data.holyDamage} damage to demons and undead.
 
-#acc:Cast time: ${channelTime} sec:#`;
+#acc:Cast time: ${castTime} sec:#`;
 
-        this.UpdateUnitAbilityBase(unit, tooltip);
+        this.UpdateUnitAbilityBase(unit, tooltip, undefined, undefined, name);
     }
 }

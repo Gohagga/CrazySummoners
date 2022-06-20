@@ -29,11 +29,15 @@ export abstract class OrbAbility extends AbilityBase {
         if (data.tooltip) BlzSetAbilityExtendedTooltip(this.id, this.textRenderer.Render(this.tooltipCost + data.tooltip), 0);
     }
 
-    protected override UpdateUnitAbilityBase(unit: Unit, tooltip?: string, cost?: number, cooldown?: number, name?: string) {
+    protected override UpdateUnitAbilityBase(unit: Unit, tooltip?: string, cost?: number, cooldown?: number, name?: string, castTime?: number) {
         tooltip = this.tooltipCost + tooltip;
         tooltip = this.textRenderer.Render(tooltip);
         if (name) name = this.textRenderer.Render(name);
-        super.UpdateUnitAbilityBase(unit, tooltip, cost, cooldown, name);
+        super.UpdateUnitAbilityBase(unit, tooltip, cost, cooldown, undefined, castTime);
+    }
+
+    protected SetFollowThrough(unit: Unit, level: number, value: number) {
+        BlzSetAbilityRealLevelField(unit.getAbility(this.id), ABILITY_RLF_FOLLOW_THROUGH_TIME, level - 1, value);
     }
 
 }

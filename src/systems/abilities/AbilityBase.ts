@@ -32,13 +32,14 @@ export abstract class AbilityBase implements ISkill {
 
     abstract UpdateUnitSkill(unit: Unit): void;
 
-    protected UpdateUnitAbilityBase(unit: Unit, tooltip?: string, cost?: number, cooldown?: number, name?: string) {
+    protected UpdateUnitAbilityBase(unit: Unit, tooltip?: string, cost?: number, cooldown?: number, name?: string, castTime?: number) {
         let lvl = unit.getAbilityLevel(this.id) - 1;
         let ab: ability;
         if (cost) unit.setAbilityManaCost(this.id, lvl, cost);
         if (cooldown) unit.setAbilityCooldown(this.id, lvl, cooldown);
         if (tooltip) BlzSetAbilityStringLevelField((ab ||= unit.getAbility(this.id)), ABILITY_SLF_TOOLTIP_NORMAL_EXTENDED, lvl, tooltip);
         if (name) BlzSetAbilityStringLevelField((ab ||= unit.getAbility(this.id)), ABILITY_SLF_TOOLTIP_NORMAL, lvl, name);
+        if (castTime) BlzSetAbilityRealLevelField((ab ||= unit.getAbility(this.id)), ABILITY_RLF_CASTING_TIME, lvl, castTime);
     }
 
     AddToUnit(unit: Unit): boolean {

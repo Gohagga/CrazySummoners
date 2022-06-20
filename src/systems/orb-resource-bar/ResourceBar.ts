@@ -7,6 +7,8 @@ import { OrbFactory } from "./OrbFactory";
 export interface ResourceBarConfig {
     summoningOrbCooldown: number,
     coloredOrbCooldown: number,
+    coloredMaxCount: number,
+    summoningMaxCount: number,
 }
 
 export class ResourceBar implements IResourceBarModel {
@@ -14,6 +16,8 @@ export class ResourceBar implements IResourceBarModel {
     private _orbs: Orb[] = [];
     private coloredOrbCooldown: number;
     private summoningOrbCooldown: number;
+    private coloredMaxCount: number;
+    private summoningMaxCount: number;
 
     onUpdate = () => {};
 
@@ -24,13 +28,28 @@ export class ResourceBar implements IResourceBarModel {
     ) {
         this.coloredOrbCooldown = config.coloredOrbCooldown;
         this.summoningOrbCooldown = config.summoningOrbCooldown;
+        this.coloredMaxCount = config.coloredMaxCount;
+        this.summoningMaxCount = config.summoningMaxCount;
     }
 
     public get orbs(): Orb[] {
         return this._orbs;
     }
 
-    public AddOrb(orbType: OrbType): Orb {
+    public AddOrb(orbType: OrbType): Orb | null {
+
+        // Validation
+        let summ = 0;
+        let col = 0;
+        for (let o of this._orbs) {
+            if (o.orbTypeId == OrbType.Summoning) summ++;
+            else col++;
+        }
+
+        if (orbType == OrbType.Summoning && summ >= this.summoningMaxCount) return null;
+        if (orbType != OrbType.Summoning && col >= this.coloredMaxCount) return null;
+
+        // Create
         let orb = this.orbFactory.Create(orbType, this.owner);
 
         this._orbs.push(orb);
@@ -91,5 +110,6 @@ export class ResourceBar implements IResourceBarModel {
             orb.Destroy();
         }
         this._orbs = [];
+        this.onUpdate();
     }
 }
