@@ -1,9 +1,11 @@
 import { OrbType } from "content/constants/OrbType";
+import { UnitType } from "content/constants/UnitType";
 import { ArcaneTomeShopConfig } from "content/shop/ArcaneTomeShop";
 import { BlessAbilityData } from "content/spells/paladin/Bless";
 import { PurgeAbilityData } from "content/spells/paladin/Purge";
 import { RejuvenateAbilityData } from "content/spells/paladin/Rejuvenation";
 import { SummonMeleeAbilityData } from "content/spells/paladin/SummonMelee";
+import { UnitTypeServiceConfig } from "systems/classification-service/UnitTypeService";
 import { Coords } from "systems/coords/Coords";
 import { DummyUnitManagerConfig } from "systems/dummies/DummyUnitManager";
 import { GameStateManagerConfig } from "systems/game-state/GameStateManager";
@@ -465,6 +467,22 @@ export class Config {
         }
     }
 
+    unitTypeService: UnitTypeServiceConfig = {
+        unitTypeClass: {
+            'hF00': UnitType.Human,
+            'hF01': UnitType.Human,
+            'hF02': UnitType.Human,
+            'hF03': UnitType.Human,
+            'hF04': UnitType.Human,
+            'hF05': UnitType.Human,
+            'hF06': UnitType.Human,
+            'hF07': UnitType.Human,
+            'hF08': UnitType.Human,
+            'hF09': UnitType.Human,
+            'nD01': UnitType.Demon,
+        }
+    }
+
     //#region Spells
 
     bless: BlessAbilityData = {
@@ -494,6 +512,13 @@ export class Config {
         orbCost: [OrbType.White, OrbType.White, OrbType.White],
         name: '|cffffff80Rejuvenate|r - 1',
         tooltip: '',
+        castSfx: 'RepentanceCastAnimCenteredScaledUp_00.mdl',
+        damageSfxModel: 'Abilities/Spells/Human/HolyBolt/HolyBoltSpecialArt.mdl',
+        effectSfxModel: 'SingularityOrange.mdl',
+        dummyPurge: {
+            orderId: OrderId.Dispel,
+            spellCodeId: 'A03C'
+        }
     }
     
     summonMelee: SummonMeleeAbilityData = {

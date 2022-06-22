@@ -263,9 +263,6 @@ export class GameStateManager {
             this.unitsNotToRemove.add(u.id);
         }
 
-        // Binding camera to play area
-        SetCameraBoundsToRect(this.choiceMap.playArea);
-
         // Creating hero shop
         for (let team of this.teamManager.teams) {
             let loc = this.choiceMap.teamStartingPosition[team.id];
@@ -276,12 +273,20 @@ export class GameStateManager {
             for (let p of team.teamMembers) {
                 if (p.isLocal()) {
                     camera.applyForceDuration(true, 0.05);
+                    // PanCameraToTimedForPlayer(p.handle, camera.destPoint.x, camera.destPoint.y, 0.05);
                 }
                 this.SetEnabledFogModifierForPlayer(this.choiceMapId, p, true);
                 ClearSelectionForPlayer(p.handle);
                 SelectUnitForPlayerSingle(heroShop.handle, p.handle);
             }
         }
+
+        // Binding camera to play area
+        let playArea = this.choiceMap.playArea;
+        new Timer().start(0.1, false, () => {
+            SetCameraBoundsToRect(playArea);
+            DestroyTimer(GetExpiredTimer());
+        });
 
         this.teamDamage = {};
         for (let t of this.teamManager.teams) {

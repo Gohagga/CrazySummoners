@@ -123,8 +123,8 @@ function CreateUnitsForPlayer9()
     local unitID
     local t
     local life
-    u = BlzCreateUnitWithSkin(p, FourCC("hF01"), -3977.7, -3616.7, 106.549, FourCC("hF01"))
-    u = BlzCreateUnitWithSkin(p, FourCC("hF01"), -4072.5, -3586.8, 356.693, FourCC("hF01"))
+    u = BlzCreateUnitWithSkin(p, FourCC("nD01"), -3968.7, -3639.5, 98.260, FourCC("nD01"))
+    u = BlzCreateUnitWithSkin(p, FourCC("nD01"), -4046.8, -3760.4, 183.269, FourCC("nD01"))
 end
 
 function CreateNeutralHostileBuildings()

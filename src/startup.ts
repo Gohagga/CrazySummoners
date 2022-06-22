@@ -36,6 +36,9 @@ import { ArcaneTomeShop } from "content/shop/ArcaneTomeShop";
 import { SpellcastingService } from "systems/progress-bars/SpellcastingService";
 import { DummyAbilityFactory } from "systems/dummies/DummyAbilityFactory";
 import { DummyUnitManager } from "systems/dummies/DummyUnitManager";
+import { UnitTypeService } from "systems/classification-service/UnitTypeService";
+import { ClassificationService } from "systems/classification-service/ClassificationService";
+import { UnitType } from "content/constants/UnitType";
 
 export function initializeGame() {
 
@@ -93,14 +96,16 @@ export function initializeGame() {
     const interruptableService = new InterruptableService();
     const enumService = new EnumUnitService();
     const voteDialogService = new VoteDialogService();
-    
-    const abilityEventHandler = new AbilityEventHandler();
-    const abilityEventProvider = new AbilityEventProvider(abilityEventHandler, interruptableService);
+    const classificationService = new ClassificationService<UnitType>();
+    const unitTypeService = new UnitTypeService(config.unitTypeService, classificationService);
+
+    const abilityEvent = new AbilityEventHandler();
+    const abilityEventProvider = new AbilityEventProvider(abilityEvent, interruptableService);
     const resourceBarManager = new ResourceBarManager(orbFactory, config.resourceBarManager);
     const teamManager = new TeamManager(players, teams);
     const skillManager = new SkillManager();
     const dummyUnitManager = new DummyUnitManager(config.dummyUnitManager);
-    
+
     const minionSummoningService = new MinionSummoningService(config.minionSummoning, minionFactory, enumService, teamManager, new MinionAiManager());
     const spellcastingService = new SpellcastingService(config.spellcastingService, interruptableService);
     const dummyAbilityFactory = new DummyAbilityFactory(dummyUnitManager);
@@ -108,10 +113,10 @@ export function initializeGame() {
     //#region Spells
     const abl = {
         rejuvenate: new Rejuvenate(config.rejuvenate),
-        bless: new Bless(config.bless, abilityEventHandler, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory),
-        purge: new Purge(config.purge),
+        bless: new Bless(config.bless, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory),
+        purge: new Purge(config.purge, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory, unitTypeService),
         
-        summonMelee: new SummonMelee(config.summonMelee, abilityEventHandler, minionSummoningService, resourceBarManager),
+        summonMelee: new SummonMelee(config.summonMelee, abilityEvent, minionSummoningService, resourceBarManager),
     }
     //#endregion
 

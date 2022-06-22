@@ -72,8 +72,6 @@ export class Bless extends OrbAbility {
         
         let dummyBlessId = FourCC(data.dummyBless.spellCodeId);
         this.blessEffect = dummyAbilityFactory.CreateTargetEffect<{ bonus: number }>(dummyBlessId, data.dummyBless.orderId, (prop, a, lvl) => {
-
-            print("Setting up bless dummy: lvl, bonus", lvl, prop.bonus);
             BlzSetAbilityRealLevelField(a, ABILITY_RLF_DAMAGE_INCREASE_PERCENT_INF1, lvl - 1, prop.bonus);
         });
 
