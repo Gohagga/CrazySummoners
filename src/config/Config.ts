@@ -1,10 +1,13 @@
+import { Models } from "content/constants/Models";
 import { OrbType } from "content/constants/OrbType";
+import { Units } from "content/constants/Units";
 import { UnitType } from "content/constants/UnitType";
 import { ArcaneTomeShopConfig } from "content/shop/ArcaneTomeShop";
 import { BlessAbilityData } from "content/spells/paladin/Bless";
 import { PurgeAbilityData } from "content/spells/paladin/Purge";
 import { RejuvenateAbilityData } from "content/spells/paladin/Rejuvenation";
 import { SummonMeleeAbilityData } from "content/spells/paladin/SummonMelee";
+import { SummonRangedAbilityData } from "content/spells/paladin/SummonRanged";
 import { UnitTypeServiceConfig } from "systems/classification-service/UnitTypeService";
 import { Coords } from "systems/coords/Coords";
 import { DummyUnitManagerConfig } from "systems/dummies/DummyUnitManager";
@@ -462,6 +465,456 @@ export class Config {
                         defenseRatio: 0.5,
                         offenseRatio: 0.5,
                     },
+                    'hR00': {
+                        attack: {
+                            diceTweaks: [13, 25, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.2,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.37,
+                        offenseRatio: 0.63,
+                    },
+                    'hR01': {
+                        attack: {
+                            diceTweaks: [13, 25, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.2,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.37,
+                        offenseRatio: 0.63,
+                    },
+                    'hR02': {
+                        attack: {
+                            diceTweaks: [13, 25, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.2,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.37,
+                        offenseRatio: 0.63,
+                    },
+                    'hR03': {
+                        attack: {
+                            diceTweaks: [13, 25, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.2,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.37,
+                        offenseRatio: 0.63,
+                    },
+                    'hR04': {
+                        attack: {
+                            diceTweaks: [13, 25, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.2,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.37,
+                        offenseRatio: 0.63,
+                    },
+                    'hR05': {
+                        attack: {
+                            diceTweaks: [13, 25, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.2,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.37,
+                        offenseRatio: 0.63,
+                    },
+                    'hR06': {
+                        attack: {
+                            diceTweaks: [13, 25, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.2,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.37,
+                        offenseRatio: 0.63,
+                    },
+                    'hR07': {
+                        attack: {
+                            diceTweaks: [13, 25, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.2,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.37,
+                        offenseRatio: 0.63,
+                    },
+                    'hR08': {
+                        attack: {
+                            diceTweaks: [13, 25, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.2,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.37,
+                        offenseRatio: 0.63,
+                    },
+                    'hR09': {
+                        attack: {
+                            diceTweaks: [13, 25, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.2,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0.1,
+                        },
+                        defenseRatio: 0.37,
+                        offenseRatio: 0.63,
+                    },
+                    [Units.CacoDemon]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.EvilEye]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.Gargoyle]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.VileTemptress]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.Hydralisk]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.Destroyer]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.Ocula]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.DemonLord]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.EredarSorcerer]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.Overfiend]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.Wig]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.FelHound]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.ClawDevil]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.FelGuard]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.FacelessOne]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.Oni]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.DemonSlasher]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.DemonBlademaster]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.DoomGuard]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
+                    [Units.PitLord]: {
+                        attack: {
+                            diceTweaks: [13, 26, 0.2],
+                            dpsVariation: 0.3,
+                            speed: 1.4,
+                            targetsCount: 1,
+                            targetsMultiplier: 1
+                        },
+                        defense: {
+                            armorGrowth: 0.01,
+                            armorRatio: 0,
+                        },
+                        defenseRatio: 0.45,
+                        offenseRatio: 0.55,
+                    },
                 }
             }
         }
@@ -469,17 +922,47 @@ export class Config {
 
     unitTypeService: UnitTypeServiceConfig = {
         unitTypeClass: {
-            'hF00': UnitType.Human,
-            'hF01': UnitType.Human,
-            'hF02': UnitType.Human,
-            'hF03': UnitType.Human,
-            'hF04': UnitType.Human,
-            'hF05': UnitType.Human,
-            'hF06': UnitType.Human,
-            'hF07': UnitType.Human,
-            'hF08': UnitType.Human,
-            'hF09': UnitType.Human,
-            'nD01': UnitType.Demon,
+            [Units.Woodcutter]:          UnitType.Human,
+            [Units.Militia]:             UnitType.Human,
+            [Units.Enforcer]:            UnitType.Human,
+            [Units.Footman]:             UnitType.Human,
+            [Units.Swordsman]:           UnitType.Human,
+            [Units.Captain]:             UnitType.Human,
+            [Units.HorsemanKnight]:      UnitType.Human,
+            [Units.Guardian]:            UnitType.Human,
+            [Units.Templar]:             UnitType.Human,
+            [Units.HolyKnight]:          UnitType.Human,
+            [Units.Peasant]:             UnitType.Human,
+            [Units.Rogue]:               UnitType.Human,
+            [Units.SpearThrower]:        UnitType.Human,
+            [Units.Archer]:              UnitType.Human,
+            [Units.Ranger]:              UnitType.Human,
+            [Units.Rifleman]:            UnitType.Human,
+            [Units.Sharpshooter]:        UnitType.Human,
+            [Units.MortarTeam]:          UnitType.Human,
+            [Units.FlyingMachine]:       UnitType.Human,
+            [Units.GryphonRider]:        UnitType.Human,
+
+            [Units.CacoDemon]:           UnitType.Demon,
+            [Units.EvilEye]:             UnitType.Demon,
+            [Units.Gargoyle]:            UnitType.Demon,
+            [Units.VileTemptress]:       UnitType.Demon,
+            [Units.Hydralisk]:           UnitType.Demon,
+            [Units.Destroyer]:           UnitType.Demon,
+            [Units.Ocula]:               UnitType.Demon,
+            [Units.DemonLord]:           UnitType.Demon,
+            [Units.EredarSorcerer]:      UnitType.Demon,
+            [Units.Overfiend]:           UnitType.Demon,
+            [Units.Wig]:                 UnitType.Demon,
+            [Units.FelHound]:            UnitType.Demon,
+            [Units.ClawDevil]:           UnitType.Demon,
+            [Units.FelGuard]:            UnitType.Demon,
+            [Units.FacelessOne]:         UnitType.Demon,
+            [Units.Oni]:                 UnitType.Demon,
+            [Units.DemonSlasher]:        UnitType.Demon,
+            [Units.DemonBlademaster]:    UnitType.Demon,
+            [Units.DoomGuard]:           UnitType.Demon,
+            [Units.PitLord]:             UnitType.Demon,
         }
     }
 
@@ -504,15 +987,17 @@ export class Config {
         orbCost: [OrbType.White, OrbType.White, OrbType.White],
         name: '|cffffff80Rejuvenate|r - 1',
         tooltip: '',
+        castSfx: Models.CastRestoration,
+        healSfxModel: 'Abilities/Spells/Demon/DarkPortal/DarkPortalTarget.mdl',
     }
 
     purge: PurgeAbilityData = {
         abilityCode: 'AP03',
         orderId: OrderId.Rejuvination,
         orbCost: [OrbType.White, OrbType.White, OrbType.White],
-        name: '|cffffff80Rejuvenate|r - 1',
+        name: '|cffffff80Purge|r - 1',
         tooltip: '',
-        castSfx: 'RepentanceCastAnimCenteredScaledUp_00.mdl',
+        castSfx: Models.CastRepentance,
         damageSfxModel: 'Abilities/Spells/Human/HolyBolt/HolyBoltSpecialArt.mdl',
         effectSfxModel: 'SingularityOrange.mdl',
         dummyPurge: {
@@ -538,6 +1023,26 @@ export class Config {
             8: 'hF07',
             9: 'hF08',
             10: 'hF09',
+        }
+    }
+
+    summonRanged: SummonRangedAbilityData = {
+        abilityCode: 'A002',
+        orderId: OrderId.Acidbomb,
+        orbCost: [OrbType.Summoning],
+        name: 'Summon Ranged',
+        tooltip: '',
+        levelSummonedUnitTypeId: {
+            1: 'hR00',
+            2: 'hR01',
+            3: 'hR02',
+            4: 'hR03',
+            5: 'hR04',
+            6: 'hR05',
+            7: 'hR06',
+            8: 'hR07',
+            9: 'hR08',
+            10: 'hR09',
         }
     }
     

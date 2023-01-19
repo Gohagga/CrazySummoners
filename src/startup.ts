@@ -39,6 +39,7 @@ import { DummyUnitManager } from "systems/dummies/DummyUnitManager";
 import { UnitTypeService } from "systems/classification-service/UnitTypeService";
 import { ClassificationService } from "systems/classification-service/ClassificationService";
 import { UnitType } from "content/constants/UnitType";
+import { SummonRanged } from "content/spells/paladin/SummonRanged";
 
 export function initializeGame() {
 
@@ -112,11 +113,12 @@ export function initializeGame() {
 
     //#region Spells
     const abl = {
-        rejuvenate: new Rejuvenate(config.rejuvenate),
+        rejuvenate: new Rejuvenate(config.rejuvenate, abilityEvent, resourceBarManager, spellcastingService, enumService),
         bless: new Bless(config.bless, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory),
         purge: new Purge(config.purge, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory, unitTypeService),
         
         summonMelee: new SummonMelee(config.summonMelee, abilityEvent, minionSummoningService, resourceBarManager),
+        summonRanged: new SummonRanged(config.summonRanged, abilityEvent, minionSummoningService, resourceBarManager),
     }
     //#endregion
 

@@ -1,9 +1,10 @@
+import { Units } from "content/constants/Units";
 import { UnitType } from "content/constants/UnitType";
 import { Unit } from "w3ts";
 import { ClassificationService } from "./ClassificationService";
 
 export interface UnitTypeServiceConfig {
-    unitTypeClass: Record<string, UnitType>;
+    unitTypeClass: Record<Units, UnitType>;
 }
 
 export class UnitTypeService {
@@ -15,7 +16,7 @@ export class UnitTypeService {
         this.classificationService = new ClassificationService<UnitType>();
         for (let k of Object.keys(config.unitTypeClass)) {
             let type = FourCC(k);
-            this.classificationService.Set(type, config.unitTypeClass[k]);
+            this.classificationService.Set(type, config.unitTypeClass[<Units>k]);
         }
     }
 

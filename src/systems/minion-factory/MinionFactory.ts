@@ -1,3 +1,4 @@
+import { Units } from "content/constants/Units";
 import { Coords } from "systems/coords/Coords";
 import { Log } from "systems/log/Log";
 import { MapPlayer, Unit } from "w3ts";
@@ -28,7 +29,7 @@ export class MinionFactory {
             let weights = config.unitBalance[unitBalanceId].unitTypeStatWeight;
             for (let unitTypeCode of Object.keys(weights)) {
                 let unitTypeId = FourCC(unitTypeCode);
-                unitBalance.unitTypeStatWeight[unitTypeId] = weights[unitTypeCode];
+                unitBalance.unitTypeStatWeight[unitTypeId] = weights[<Units>unitTypeCode];
             }
         }
 
@@ -176,7 +177,7 @@ export type GameBalanceDataBase = {
 }
 
 export type UnitBalanceDataBase = {
-    unitTypeStatWeight: Record<string, UnitTypeStatWeight>;
+    unitTypeStatWeight: Record<Units, UnitTypeStatWeight>;
 }
 
 export type UnitBalanceData = {

@@ -1,7 +1,7 @@
 {
   "mapFolder": "CrazySummoners.w3x",
   "minifyScript": false,
-  "gameExecutable": "C:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe",
+  "gameExecutable": "E:\\Program Files (x86)\\Warcraft III\\_retail_\\x86_64\\Warcraft III.exe",
   "outputFolder": "./dist/bin",
   "archiveOutputFolders": [
     "./versions",
