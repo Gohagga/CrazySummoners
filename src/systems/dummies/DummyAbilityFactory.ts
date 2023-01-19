@@ -1,10 +1,12 @@
 import { Unit } from "w3ts";
 import { DelayedTargetEffect } from "./dummy-effects/DelayedTargetEffect";
+import { PointBlankEffect } from "./dummy-effects/PointBlankEffect";
 import { PointEffect } from "./dummy-effects/PointEffect";
 import { TargetEffect } from "./dummy-effects/TargetEffect";
 import { IDelayedTargetEffect as IDelayedTargetEffect } from "./interfaces/IDelayedTargetEffect";
 import { IDummyAbilityFactory, TargetType } from "./interfaces/IDummyAbilityFactory";
 import { IDummyUnitManager } from "./interfaces/IDummyUnitManager";
+import { IPointBlankEffect } from "./interfaces/IPointBlankEffect";
 import { IPointEffect } from "./interfaces/IPointEffect";
 import { ITargetEffect, TargetEffectProperties } from "./interfaces/ITargetEffect";
 
@@ -25,6 +27,12 @@ export class DummyAbilityFactory implements IDummyAbilityFactory {
     CreatePointEffect<Properties>(dummyAbilityId: number, orderId: number, setup?: (properties: Properties, ability: ability, lvl: number) => void): IPointEffect<Properties> {
         
         let effect = new PointEffect(this.dummyUnitManager, dummyAbilityId, orderId, setup);
+        return effect;
+    }
+
+    CreatePointBlankEffect<Properties>(dummyAbilityId: number, orderId: number, setup?: (properties: Properties, ability: ability, lvl: number) => void):  IPointBlankEffect<Properties> {
+        
+        let effect = new PointBlankEffect(this.dummyUnitManager, dummyAbilityId, orderId, setup);
         return effect;
     }
 

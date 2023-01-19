@@ -3,76 +3,84 @@ import { OrbAbility, OrbAbilityData } from "systems/abilities/OrbAbility";
 import { Wc3AbilityData } from "systems/abilities/Wc3AbilityData";
 import { IAbilityEvent } from "systems/ability-events/event-models/IAbilityEvent";
 import { IAbilityEventHandler } from "systems/ability-events/IAbilityEventHandler";
+import { UnitTypeService } from "systems/classification-service/UnitTypeService";
 import { IDummyAbilityFactory } from "systems/dummies/interfaces/IDummyAbilityFactory";
+import { IPointBlankEffect } from "systems/dummies/interfaces/IPointBlankEffect";
+import { IPointEffect } from "systems/dummies/interfaces/IPointEffect";
 import { ITargetEffect } from "systems/dummies/interfaces/ITargetEffect";
 import { IEnumUnitService } from "systems/enum-service/IEnumUnitService";
+import { Log } from "systems/log/Log";
 import { ResourceBarManager } from "systems/orb-resource-bar/ResourceBarManager";
-import { ICastBarService } from "systems/progress-bars/ICastBarService";
 import { SpellcastingService } from "systems/progress-bars/SpellcastingService";
 import { IUnitConfigurable } from "systems/unit-configurable/IUnitConfigurable";
 import { UnitConfigurable } from "systems/unit-configurable/UnitConfigurable";
 import { Effect, Unit } from "w3ts";
 
-type BlessUnitData = {
+type InvigorateUnitData = {
     level: Record<number, {
-        damageBonusPercent: number,
-        castTime: number,
-        duration: number,
+        lifeRegenBonus: number,
         aoe: number,
+        castTime: number,
     }>;
 }
 
-export interface BlessAbilityData extends OrbAbilityData {
+export interface InvigorateAbilityData extends OrbAbilityData {
     castSfx: string,
-    dummyBless: {
+    // damageSfxModel: string,
+    // effectSfxModel: string,
+    dummyInvigorate: {
         spellCodeId: string,
         orderId: number
-    }
+    },
 }
 
-export class Bless extends OrbAbility {
+export class Invigorate extends OrbAbility {
 
-    private unitConfigurable = new UnitConfigurable<BlessUnitData>(() => ({
+    private unitConfigurable = new UnitConfigurable<InvigorateUnitData>(() => ({
         level: {
             1: {
-                damageBonusPercent: 0.1,
-                castTime: 3,
-                duration: 10,
-                aoe: 250,
+                lifeRegenBonus: 150,
+                castTime: 1.5,
+                aoe: 300,
             },
             2: {
-                damageBonusPercent: 0.2,
-                castTime: 2.5,
-                duration: 20,
+                lifeRegenBonus: 200,
+                castTime: 1.2,
                 aoe: 350,
             },
             3: {
-                damageBonusPercent: 0.2,
-                castTime: 2,
-                duration: 20,
-                aoe: 450,
+                lifeRegenBonus: 250,
+                castTime: 0.9,
+                aoe: 400,
             }
         }
     }));
+
     
     private readonly castSfx: string;
-    private readonly blessEffect: ITargetEffect<{ bonus: number }>
+    // private readonly damageSfxModel: string;
+    // private readonly effectSfxModel: string;
+    private readonly invigorateEffect: IPointBlankEffect<{ lifeRegenBonus: number, aoe: number }>
 
     constructor(
-        data: BlessAbilityData,
+        data: InvigorateAbilityData,
         abilityEventHandler: IAbilityEventHandler,
         private readonly resourceBarManager: ResourceBarManager,
         private readonly spellcastingService: SpellcastingService,
         private readonly enumService: IEnumUnitService,
         dummyAbilityFactory: IDummyAbilityFactory,
+        private readonly unitTypeService: UnitTypeService,
     ) {
         super(data);
 
         this.castSfx = data.castSfx;
-        
-        let dummyBlessId = FourCC(data.dummyBless.spellCodeId);
-        this.blessEffect = dummyAbilityFactory.CreateTargetEffect<{ bonus: number }>(dummyBlessId, data.dummyBless.orderId, (prop, a, lvl) => {
-            BlzSetAbilityRealLevelField(a, ABILITY_RLF_DAMAGE_INCREASE_PERCENT_INF1, lvl - 1, prop.bonus);
+        // this.damageSfxModel = data.damageSfxModel;
+        // this.effectSfxModel = data.effectSfxModel;
+
+        let dummyBlessId = FourCC(data.dummyInvigorate.spellCodeId);
+        this.invigorateEffect = dummyAbilityFactory.CreatePointBlankEffect<{ lifeRegenBonus: number, aoe: number }>(dummyBlessId, data.dummyInvigorate.orderId, (prop, a, lvl) => {
+            BlzSetAbilityRealLevelField(a, ABILITY_RLF_LIFE_REGENERATION_RATE, lvl - 1, prop.lifeRegenBonus);
+            BlzSetAbilityRealLevelField(a, ABILITY_RLF_AREA_OF_EFFECT, lvl - 1, prop.aoe);
         });
 
         abilityEventHandler.OnAbilityCast(this.id, e => this.Execute(e));
@@ -96,18 +104,15 @@ export class Bless extends OrbAbility {
 
             if (false == this.resourceBarManager.Get(ownerId).Consume(this.orbCost)) return;
 
-            let units = this.enumService.EnumUnitsInRange(targetPoint, data.aoe, target =>
-                target.isAlly(owner));
-
-            this.blessEffect.Setup({
+            this.invigorateEffect.Setup({
                 level: lvl,
-                bonus: data.damageBonusPercent,
+                aoe: data.aoe,
+                lifeRegenBonus: data.lifeRegenBonus,
+                castingPlayer: owner
             });
 
-            for (let u of units) {
-                this.blessEffect.Cast(u);
-            }
-
+            this.invigorateEffect.Cast(targetPoint);
+            
         }, (orderId, cb) => {
 
             castSfx.destroy();
@@ -126,13 +131,12 @@ export class Bless extends OrbAbility {
         let lvl = unit.getAbilityLevel(this.id);
         let name = this.name + ' - ' + lvl;
 
-        let damageBonus = string.format('%.0f', data.damageBonusPercent * 100);
         let castTime = string.format('%.1f', data.castTime);
         let tooltip =
-`Blesses units in range raising their damage by #red:${damageBonus}:#.|nLasts #blu:${data.duration}:# seconds
+`Removes effects in a target #blu:${data.aoe}:# area and deals #red:${data.lifeRegenBonus}:# damage to demons and undead.
 
-#acc:Cast time: ${castTime} sec:#`
+#acc:Cast time: ${castTime} sec:#`;
+
         this.UpdateUnitAbilityBase(unit, tooltip, undefined, undefined, name);
-        this.SetFollowThrough(unit, lvl, data.castTime);
     }
 }

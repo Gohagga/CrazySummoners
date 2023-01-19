@@ -19,7 +19,9 @@ export class PointEffect<Properties> implements IPointEffect<Properties> {
 
     Setup(properties: Properties & EffectProperties): IPointEffect<Properties> {
 
-        if (!this.dummy) this.dummy = this.dummyUnitManager.GetDummy();
+        if (!this.dummy) {
+            this.dummy = this.dummyUnitManager.GetDummy();
+        }
 
         if (properties.origin) {
             this.dummy.x = properties.origin.x;
@@ -29,6 +31,10 @@ export class PointEffect<Properties> implements IPointEffect<Properties> {
         this.dummy.addAbility(this.abilityId);
         this.dummy.setAbilityLevel(this.abilityId, properties.level);
 
+        if (properties.castingPlayer) {
+            this.dummy.setOwner(properties.castingPlayer, false);
+        }
+        
         if (this.setup) this.setup(properties, this.dummy.getAbility(this.abilityId), properties.level);
 
         return this;

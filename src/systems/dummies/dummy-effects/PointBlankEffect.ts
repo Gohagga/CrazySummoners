@@ -1,10 +1,12 @@
+import { MapPlayer } from "w3ts";
 import { Timer } from "w3ts/handles/timer";
 import { Trigger } from "w3ts/handles/trigger";
 import { Unit } from "w3ts/handles/unit";
 import { IDummyUnitManager } from "../interfaces/IDummyUnitManager";
+import { EffectProperties, IPointBlankEffect } from "../interfaces/IPointBlankEffect";
 import { ICoords, ITargetEffect, TargetEffectProperties } from "../interfaces/ITargetEffect";
 
-export class TargetEffect<Properties> implements ITargetEffect<Properties> {
+export class PointBlankEffect<Properties> implements IPointBlankEffect<Properties> {
 
     private dummy: Unit | null = null;
 
@@ -16,7 +18,7 @@ export class TargetEffect<Properties> implements ITargetEffect<Properties> {
     ) {
     }
 
-    Setup(properties: Properties & TargetEffectProperties): ITargetEffect<Properties> {
+    Setup(properties: Properties & EffectProperties): IPointBlankEffect<Properties> {
 
         if (!this.dummy) {
             this.dummy = this.dummyUnitManager.GetDummy();
@@ -33,27 +35,25 @@ export class TargetEffect<Properties> implements ITargetEffect<Properties> {
         if (properties.castingPlayer) {
             this.dummy.setOwner(properties.castingPlayer, false);
         }
-        
-        if (this.setup) this.setup(properties, this.dummy.getAbility(this.abilityId), properties.level);
 
+        if (this.setup) this.setup(properties, this.dummy.getAbility(this.abilityId), properties.level);
         return this;
     }
 
-    Cast(target: Unit, level: number, origin?: ICoords): void {
+    Cast(origin: ICoords, level?: number): void {
 
         if (!this.dummy) {
             this.dummy = this.dummyUnitManager.GetDummy();
             this.dummy.addAbility(this.abilityId);
-            this.dummy.setAbilityLevel(this.abilityId, level);
+            if (level) this.dummy.setAbilityLevel(this.abilityId, level);
         } else if (level) {
             this.dummy.setAbilityLevel(this.abilityId, level);
         }
 
         if (origin) {
-            this.dummy.x = origin.x;
-            this.dummy.y = origin.y;
+            this.dummy.setPosition(origin.x, origin.y);
         }
 
-        this.dummy.issueTargetOrder(this.orderId, target);
+        this.dummy.issueImmediateOrder(this.orderId);
     }
 }

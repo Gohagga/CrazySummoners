@@ -4,8 +4,9 @@ import { Units } from "content/constants/Units";
 import { UnitType } from "content/constants/UnitType";
 import { ArcaneTomeShopConfig } from "content/shop/ArcaneTomeShop";
 import { BlessAbilityData } from "content/spells/paladin/Bless";
+import { InvigorateAbilityData } from "content/spells/paladin/Invigorate";
 import { PurgeAbilityData } from "content/spells/paladin/Purge";
-import { RejuvenateAbilityData } from "content/spells/paladin/Rejuvenation";
+import { RejuvenateAbilityData } from "content/spells/paladin/Rejuvenate";
 import { SummonMeleeAbilityData } from "content/spells/paladin/SummonMelee";
 import { SummonRangedAbilityData } from "content/spells/paladin/SummonRanged";
 import { UnitTypeServiceConfig } from "systems/classification-service/UnitTypeService";
@@ -315,7 +316,7 @@ export class Config {
         unitBalance: {
             'balance1': {
                 unitTypeStatWeight: {
-                    'hF00': {
+                    [Units.Woodcutter]: {
                         attack: {
                             diceTweaks: [13, 23, 0.2],
                             dpsVariation: 0.3,
@@ -330,7 +331,7 @@ export class Config {
                         defenseRatio: 0.5,
                         offenseRatio: 0.5,
                     },
-                    'hF01': {
+                    [Units.Militia]: {
                         attack: {
                             diceTweaks: [13, 23, 0.2],
                             dpsVariation: 0.3,
@@ -345,7 +346,7 @@ export class Config {
                         defenseRatio: 0.5,
                         offenseRatio: 0.5,
                     },
-                    'hF02': {
+                    [Units.Enforcer]: {
                         attack: {
                             diceTweaks: [13, 23, 0.2],
                             dpsVariation: 0.3,
@@ -360,7 +361,7 @@ export class Config {
                         defenseRatio: 0.5,
                         offenseRatio: 0.5,
                     },
-                    'hF03': {
+                    [Units.Footman]: {
                         attack: {
                             diceTweaks: [13, 23, 0.2],
                             dpsVariation: 0.3,
@@ -375,7 +376,7 @@ export class Config {
                         defenseRatio: 0.5,
                         offenseRatio: 0.5,
                     },
-                    'hF04': {
+                    [Units.Swordsman]: {
                         attack: {
                             diceTweaks: [13, 23, 0.2],
                             dpsVariation: 0.3,
@@ -390,7 +391,7 @@ export class Config {
                         defenseRatio: 0.5,
                         offenseRatio: 0.5,
                     },
-                    'hF05': {
+                    [Units.Captain]: {
                         attack: {
                             diceTweaks: [13, 23, 0.2],
                             dpsVariation: 0.3,
@@ -405,7 +406,7 @@ export class Config {
                         defenseRatio: 0.5,
                         offenseRatio: 0.5,
                     },
-                    'hF06': {
+                    [Units.HorsemanKnight]: {
                         attack: {
                             diceTweaks: [13, 23, 0.2],
                             dpsVariation: 0.3,
@@ -420,7 +421,7 @@ export class Config {
                         defenseRatio: 0.5,
                         offenseRatio: 0.5,
                     },
-                    'hF07': {
+                    [Units.Guardian]: {
                         attack: {
                             diceTweaks: [13, 23, 0.2],
                             dpsVariation: 0.3,
@@ -435,7 +436,7 @@ export class Config {
                         defenseRatio: 0.5,
                         offenseRatio: 0.5,
                     },
-                    'hF08': {
+                    [Units.Templar]: {
                         attack: {
                             diceTweaks: [13, 23, 0.2],
                             dpsVariation: 0.3,
@@ -450,7 +451,7 @@ export class Config {
                         defenseRatio: 0.5,
                         offenseRatio: 0.5,
                     },
-                    'hF09': {
+                    [Units.HolyKnight]: {
                         attack: {
                             diceTweaks: [13, 23, 0.2],
                             dpsVariation: 0.3,
@@ -465,7 +466,7 @@ export class Config {
                         defenseRatio: 0.5,
                         offenseRatio: 0.5,
                     },
-                    'hR00': {
+                    [Units.Peasant]: {
                         attack: {
                             diceTweaks: [13, 25, 0.2],
                             dpsVariation: 0.3,
@@ -480,7 +481,7 @@ export class Config {
                         defenseRatio: 0.37,
                         offenseRatio: 0.63,
                     },
-                    'hR01': {
+                    [Units.Rogue]: {
                         attack: {
                             diceTweaks: [13, 25, 0.2],
                             dpsVariation: 0.3,
@@ -495,7 +496,7 @@ export class Config {
                         defenseRatio: 0.37,
                         offenseRatio: 0.63,
                     },
-                    'hR02': {
+                    [Units.SpearThrower]: {
                         attack: {
                             diceTweaks: [13, 25, 0.2],
                             dpsVariation: 0.3,
@@ -510,7 +511,7 @@ export class Config {
                         defenseRatio: 0.37,
                         offenseRatio: 0.63,
                     },
-                    'hR03': {
+                    [Units.Archer]: {
                         attack: {
                             diceTweaks: [13, 25, 0.2],
                             dpsVariation: 0.3,
@@ -525,7 +526,7 @@ export class Config {
                         defenseRatio: 0.37,
                         offenseRatio: 0.63,
                     },
-                    'hR04': {
+                    [Units.Ranger]: {
                         attack: {
                             diceTweaks: [13, 25, 0.2],
                             dpsVariation: 0.3,
@@ -540,7 +541,7 @@ export class Config {
                         defenseRatio: 0.37,
                         offenseRatio: 0.63,
                     },
-                    'hR05': {
+                    [Units.Rifleman]: {
                         attack: {
                             diceTweaks: [13, 25, 0.2],
                             dpsVariation: 0.3,
@@ -555,7 +556,7 @@ export class Config {
                         defenseRatio: 0.37,
                         offenseRatio: 0.63,
                     },
-                    'hR06': {
+                    [Units.Sharpshooter]: {
                         attack: {
                             diceTweaks: [13, 25, 0.2],
                             dpsVariation: 0.3,
@@ -570,7 +571,7 @@ export class Config {
                         defenseRatio: 0.37,
                         offenseRatio: 0.63,
                     },
-                    'hR07': {
+                    [Units.MortarTeam]: {
                         attack: {
                             diceTweaks: [13, 25, 0.2],
                             dpsVariation: 0.3,
@@ -585,7 +586,7 @@ export class Config {
                         defenseRatio: 0.37,
                         offenseRatio: 0.63,
                     },
-                    'hR08': {
+                    [Units.FlyingMachine]: {
                         attack: {
                             diceTweaks: [13, 25, 0.2],
                             dpsVariation: 0.3,
@@ -600,7 +601,7 @@ export class Config {
                         defenseRatio: 0.37,
                         offenseRatio: 0.63,
                     },
-                    'hR09': {
+                    [Units.GryphonRider]: {
                         attack: {
                             diceTweaks: [13, 25, 0.2],
                             dpsVariation: 0.3,
@@ -1003,6 +1004,21 @@ export class Config {
         dummyPurge: {
             orderId: OrderId.Dispel,
             spellCodeId: 'A03C'
+        }
+    }
+
+    invigorate: InvigorateAbilityData = {
+        abilityCode: 'AP04',
+        orderId: OrderId.Phaseshift,
+        orbCost: [OrbType.White, OrbType.White, OrbType.White],
+        name: '|cffffff80Invigorate|r - 1',
+        tooltip: '',
+        castSfx: Models.CastRestoration,
+        // damageSfxModel: 'Abilities/Spells/Human/HolyBolt/HolyBoltSpecialArt.mdl',
+        // effectSfxModel: 'SingularityOrange.mdl',
+        dummyInvigorate: {
+            orderId: OrderId.Roar,
+            spellCodeId: 'A005'
         }
     }
     

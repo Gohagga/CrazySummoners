@@ -22,7 +22,7 @@ import { RequirementType } from "content/constants/RequirementType";
 import { Bless } from "content/spells/paladin/Bless";
 import { SkillManager } from "systems/skill-manager/SkillManager";
 import { TextRendererFactory } from "systems/text-renderer/TextRendererFactory";
-import { Rejuvenate } from "content/spells/paladin/Rejuvenation";
+import { Rejuvenate } from "content/spells/paladin/Rejuvenate";
 import { Purge } from "content/spells/paladin/Purge";
 import { MinionSummoningService } from "systems/minion-summoning/MinionSummoningService";
 import { EnumUnitService } from "systems/enum-service/EnumUnitService";
@@ -40,6 +40,7 @@ import { UnitTypeService } from "systems/classification-service/UnitTypeService"
 import { ClassificationService } from "systems/classification-service/ClassificationService";
 import { UnitType } from "content/constants/UnitType";
 import { SummonRanged } from "content/spells/paladin/SummonRanged";
+import { Invigorate } from "content/spells/paladin/Invigorate";
 
 export function initializeGame() {
 
@@ -116,6 +117,7 @@ export function initializeGame() {
         rejuvenate: new Rejuvenate(config.rejuvenate, abilityEvent, resourceBarManager, spellcastingService, enumService),
         bless: new Bless(config.bless, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory),
         purge: new Purge(config.purge, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory, unitTypeService),
+        invigorate: new Invigorate(config.invigorate, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory, unitTypeService),
         
         summonMelee: new SummonMelee(config.summonMelee, abilityEvent, minionSummoningService, resourceBarManager),
         summonRanged: new SummonRanged(config.summonRanged, abilityEvent, minionSummoningService, resourceBarManager),
@@ -177,7 +179,6 @@ export function initializeGame() {
     {
         let cleanupUnits = enumService.EnumUnitsInRect(Rectangle.getWorldBounds(), t => t.typeId == FourCC('h01L'));
         for (let u of cleanupUnits) {
-            print(u.name);
             u.destroy();
         }
     }

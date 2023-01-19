@@ -109,7 +109,6 @@ export class Purge extends OrbAbility {
             });
 
             for (let u of units) {
-                print(u.name);
                 let typeId = u.typeId;
                 if ((this.unitTypeService.IsUndead(typeId) || this.unitTypeService.IsDemon(typeId))
                     && !u.isUnitType(UNIT_TYPE_MAGIC_IMMUNE) && u.isEnemy(owner)) {

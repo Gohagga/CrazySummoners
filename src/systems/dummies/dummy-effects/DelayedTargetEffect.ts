@@ -1,3 +1,4 @@
+import { MapPlayer } from "w3ts";
 import { Timer } from "w3ts/handles/timer";
 import { Trigger } from "w3ts/handles/trigger";
 import { Unit } from "w3ts/handles/unit";
@@ -26,13 +27,17 @@ export class DelayedTargetEffect<ContextType> implements IDelayedTargetEffect<Co
         });
     }
 
-    Cast(origin: ICoords, target: Unit, level: number, context: ContextType, effect: (context: ContextType) => void): void {
+    Cast(origin: ICoords, target: Unit, level: number, context: ContextType, effect: (context: ContextType) => void, castingPlayer?: MapPlayer): void {
         let dummy = this.dummyUnitManager.GetDummy();
         dummy.x = origin.x;
         dummy.y = origin.y;
 
         dummy.addAbility(this.abilityId);
         dummy.setAbilityLevel(this.abilityId, level);
+
+        if (castingPlayer) {
+            dummy.setOwner(castingPlayer, false);
+        }
 
         dummy.issueTargetOrder(this.orderId, target);
 

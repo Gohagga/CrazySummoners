@@ -62,7 +62,6 @@ export class EnumUnitService implements IEnumUnitService {
             GroupRemoveUnit(this.group, u);
             if (!IsUnitInRangeXY(u, x, y, radius)) continue;
 
-            print("enumed unit ", GetUnitName(u));
             let U = Unit.fromHandle(u);
             if (!filter || filter(U, source)) {
                 units.push(U);
