@@ -340,7 +340,7 @@ export class GameStateManager {
 
         // Remove hero selectors
         for (let hs of this.heroSelectorUnits) {
-            hs.destroy();
+            hs.kill();
         }
 
         new Timer().start(1, true, () => {

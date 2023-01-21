@@ -60,7 +60,8 @@ export class MinionSummoningService {
             return false;
 
         // Do summon stuff
-        let owner = this.teamManager.GetPlayerTeam(summoner.owner).teamOwner;
+        let team = this.teamManager.GetPlayerTeam(summoner.owner);
+        let owner = (team && team.teamOwner) || summoner.owner;
 
         let summons: Unit[] = [];
 

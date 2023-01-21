@@ -4,7 +4,9 @@ import { Units } from "content/constants/Units";
 import { UnitType } from "content/constants/UnitType";
 import { ArcaneTomeShopConfig } from "content/shop/ArcaneTomeShop";
 import { BlessAbilityData } from "content/spells/paladin/Bless";
+import { EndureAbilityData } from "content/spells/paladin/Endure";
 import { InvigorateAbilityData } from "content/spells/paladin/Invigorate";
+import { JusticeAbilityData } from "content/spells/paladin/Justice";
 import { PurgeAbilityData } from "content/spells/paladin/Purge";
 import { RejuvenateAbilityData } from "content/spells/paladin/Rejuvenate";
 import { SummonMeleeAbilityData } from "content/spells/paladin/SummonMelee";
@@ -1021,7 +1023,32 @@ export class Config {
             spellCodeId: 'A005'
         }
     }
-    
+
+    endure: EndureAbilityData = {
+        abilityCode: 'AP05',
+        orderId: OrderId.Earthquake,
+        orbCost: [OrbType.White, OrbType.White, OrbType.Purple],
+        name: '|cffffff80Endure|r - 1',
+        tooltip: '',
+        castSfx: Models.CastDetermination,
+        // damageSfxModel: 'Abilities/Spells/Human/HolyBolt/HolyBoltSpecialArt.mdl',
+        effectSfxModel: 'Abilities\\Spells\\NightElf\\Taunt\\TauntCaster.mdl',
+        dummyEndure: {
+            orderId: OrderId.Frostarmor,
+            spellCodeId: 'A00B'
+        }
+    }
+
+    justice: JusticeAbilityData = {
+        abilityCode: 'AP06',
+        orderId: OrderId.Phaseshiftoff,
+        orbCost: [OrbType.Purple, OrbType.Red],
+        name: '|cffffff80Justice|r - 1',
+        tooltip: '',
+        castSfx: Models.CastRepentance,
+        damageSfxModel: 'StormfallOrange.mdl',
+    }
+
     summonMelee: SummonMeleeAbilityData = {
         abilityCode: 'A001',
         orderId: OrderId.Acidbomb,

@@ -41,6 +41,10 @@ import { ClassificationService } from "systems/classification-service/Classifica
 import { UnitType } from "content/constants/UnitType";
 import { SummonRanged } from "content/spells/paladin/SummonRanged";
 import { Invigorate } from "content/spells/paladin/Invigorate";
+import { Endure } from "content/spells/paladin/Endure";
+import { Justice } from "content/spells/paladin/Justice";
+import { PlayerSelectionService } from "systems/enum-service/PlayerSelectionService";
+import { CheatCommands } from "systems/cheat-commands/CheatCommands";
 
 export function initializeGame() {
 
@@ -118,6 +122,8 @@ export function initializeGame() {
         bless: new Bless(config.bless, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory),
         purge: new Purge(config.purge, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory, unitTypeService),
         invigorate: new Invigorate(config.invigorate, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory, unitTypeService),
+        endure: new Endure(config.endure, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory),
+        justice: new Justice(config.justice, abilityEvent, resourceBarManager, spellcastingService),
         
         summonMelee: new SummonMelee(config.summonMelee, abilityEvent, minionSummoningService, resourceBarManager),
         summonRanged: new SummonRanged(config.summonRanged, abilityEvent, minionSummoningService, resourceBarManager),
@@ -136,12 +142,16 @@ export function initializeGame() {
     });
     
     const gameStateManager = new GameStateManager(config.gameStateManager, heroManager, minionFactory, teamManager, resourceBarManager, voteDialogService, enumService);
-
+    
     // UI
     let orbsView = GenerateOrbView(config.orbView, Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0));
     
     // Test
     {
+        const selectionService = new PlayerSelectionService(players);
+        const cheatCommands = new CheatCommands(enumService, players, teamManager, heroManager, selectionService, minionSummoningService);
+        cheatCommands.init();
+
         let orbVm: OrbViewModel[] = [];
         for (let orbView of orbsView.orbs) {
             orbVm.push(new OrbViewModel(config.orbViewModelConfig, MapPlayer.fromIndex(0), orbView));
