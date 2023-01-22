@@ -43,7 +43,6 @@ import { SummonRanged } from "content/spells/paladin/SummonRanged";
 import { Invigorate } from "content/spells/paladin/Invigorate";
 import { Endure } from "content/spells/paladin/Endure";
 import { Justice } from "content/spells/paladin/Justice";
-import { PlayerSelectionService } from "systems/enum-service/PlayerSelectionService";
 import { CheatCommands } from "systems/cheat-commands/CheatCommands";
 
 export function initializeGame() {
@@ -148,8 +147,7 @@ export function initializeGame() {
     
     // Test
     {
-        const selectionService = new PlayerSelectionService(players);
-        const cheatCommands = new CheatCommands(enumService, players, teamManager, heroManager, selectionService, minionSummoningService);
+        const cheatCommands = new CheatCommands(enumService, players, teamManager, heroManager, minionSummoningService);
         cheatCommands.init();
 
         let orbVm: OrbViewModel[] = [];

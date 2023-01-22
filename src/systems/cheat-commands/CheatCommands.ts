@@ -1,9 +1,8 @@
 import { IEnumUnitService } from "systems/enum-service/IEnumUnitService";
-import { PlayerSelectionService } from "systems/enum-service/PlayerSelectionService";
 import { IHeroManager } from "systems/hero-manager/IHeroManager";
-import { MinionSummoningService } from "systems/minion-summoning/MinionSummoningService";
+import { MinionSummoningService, SummonUnitCommand } from "systems/minion-summoning/MinionSummoningService";
 import { TeamManager } from "systems/team-manager/TeamManager";
-import { MapPlayer, Trigger } from "w3ts";
+import { MapPlayer, Trigger, Unit } from "w3ts";
 
 export class CheatCommands {
 
@@ -12,7 +11,6 @@ export class CheatCommands {
         private readonly allPlayers: MapPlayer[],
         private readonly teamManager: TeamManager,
         private readonly heroManager: IHeroManager,
-        private readonly selectionService: PlayerSelectionService,
         private readonly minionSummoningService: MinionSummoningService,
     ) {
         
@@ -38,18 +36,18 @@ export class CheatCommands {
 
         // Level up 1
         this.createChatPlayerCommand("+1", true, 0).addAction(() => {
-            let selected = this.selectionService.GetPlayerSelectedUnitIds(red)[0];
+            let selected = this.getPlayerSelectedUnits(red)[0];
             if (selected && selected.isHero()) selected.setHeroLevel(selected.getHeroLevel() + 1, true);
         });
 
         // Level up 20
         this.createChatPlayerCommand("+20", true, 0).addAction(() => {
-            let selected = this.selectionService.GetPlayerSelectedUnitIds(red)[0];
+            let selected = this.getPlayerSelectedUnits(red)[0];
             if (selected && selected.isHero()) selected.setHeroLevel(20, true);
         });
 
         this.createChatPlayerCommand("-kill", true, 0).addAction(() => {
-            let selected = this.selectionService.GetPlayerSelectedUnitIds(red);
+            let selected = this.getPlayerSelectedUnits(red);
             for (let u of selected) {
                 u.kill();
             }
@@ -60,25 +58,29 @@ export class CheatCommands {
             if (text.startsWith("-make ") == false) return;
 
             let p = MapPlayer.fromEvent();
-            let selected = this.selectionService.GetPlayerSelectedUnitIds(p)[0];
+            
+            let selected = this.getPlayerSelectedUnits(red)[0];
             if (!selected) return;
-            print("selected", selected.id, selected.name);
-            DestroyEffect(AddSpecialEffectTarget('StormfallOrange.mdl', selected.handle, "origin"));
+
             let hero = this.heroManager.GetPlayerHero(p);
             if (!hero) return;
 
             let input = text.substring(6).split(' ');
             let id = FourCC(input[0]);
-            let lvl = Number(input[input.length - 1]);
+            let lvl = Number(input[1]);
+            let amount = Number(input[2]);
             if (!id || !lvl) return;
 
-            this.minionSummoningService.Summon(selected, selected, [
-                {
+            let commands: SummonUnitCommand[] = [];
+            for (let i = 0; i < amount; i++) {
+                commands.push({
                     unitTypeId: id,
                     level: lvl,
                     ai: () => true,
-                }
-            ])
+                });
+            }
+
+            this.minionSummoningService.Summon(selected, selected, commands);
         });
 
         // this.createChatPlayerCommand("-ai", true, 0).addAction(() => {
@@ -98,5 +100,20 @@ export class CheatCommands {
         //     let ai = new PaladinController(hero, BlueCrystal, GamePlayer.Shop[p.id]);
         //     ai.Start();
         // });
+    }
+
+    private readonly group = CreateGroup();
+    private getPlayerSelectedUnits(player: MapPlayer) {
+        GroupEnumUnitsSelected(this.group, player.handle, null);
+        let retVal: Unit[] = [];
+
+        let u: unit | null;
+        while ((u = FirstOfGroup(this.group)) != null) {
+            GroupRemoveUnit(this.group, u);
+            let U = Unit.fromHandle(u);
+            retVal.push(U);
+        }
+
+        return retVal;
     }
 }
