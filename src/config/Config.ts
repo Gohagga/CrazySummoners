@@ -2,6 +2,7 @@ import { Models } from "content/constants/Models";
 import { OrbType } from "content/constants/OrbType";
 import { Units } from "content/constants/Units";
 import { UnitType } from "content/constants/UnitType";
+import { Zones } from "content/constants/Zones";
 import { ArcaneTomeShopConfig } from "content/shop/ArcaneTomeShop";
 import { BlessAbilityData } from "content/spells/paladin/Bless";
 import { EndureAbilityData } from "content/spells/paladin/Endure";
@@ -88,26 +89,42 @@ export class Config {
 
     gameStateManager: GameStateManagerConfig = {
         balanceSetChoices: {
-            "balance1": { text: 'Balance 1', hotkey: 1 },
-            "balance2": { text: 'Balance 2', hotkey: 2 },
+            "alpha1": { text: 'Alpha1', hotkey: 1 },
+            // "balance2": { text: 'Balance 2', hotkey: 2 },
         },
         unitBalanceSetChoices: {
-            "balance1": { text: 'Balance 1', hotkey: 1 },
-            "balance2": { text: 'Balance 2', hotkey: 2 },
+            "alpha1": { text: 'Alpha1', hotkey: 1 },
+            // "balance2": { text: 'Balance 2', hotkey: 2 },
         },
         mapChoices: {
             "map1": {
+                name: "Map 1",
                 teamStartingPosition: { 0: Coords.fromWc3Unit(gg_unit_h01L_0017) , 1: Coords.fromWc3Unit(gg_unit_h01L_0018) },
                 teamCamera: { 0: CameraSetup.fromHandle(gg_cam_GameCameraH1), 1: CameraSetup.fromHandle(gg_cam_GameCameraH2) },
                 visibility: [gg_rct_PlayArea],
                 playArea: gg_rct_Battleground,
+                laneZones: { 
+                    [Zones.Lane1]: { rectangles: [gg_rct_Lane_1], circles: [] },
+                    [Zones.Lane2]: { rectangles: [gg_rct_Lane_2], circles: [] },
+                    [Zones.Lane3]: { rectangles: [gg_rct_Lane_3], circles: [] },
+                    [Zones.Lane4]: { rectangles: [gg_rct_Lane_4], circles: [] },
+                    [Zones.Lane5]: { rectangles: [gg_rct_Lane_5], circles: [] },
+                },
             },
-            "map2": {
-                teamStartingPosition: { 0: Coords.fromWc3Unit(gg_unit_h01L_0017) , 1: Coords.fromWc3Unit(gg_unit_h01L_0018) },
-                teamCamera: { 0: CameraSetup.fromHandle(gg_cam_GameCameraH1), 1: CameraSetup.fromHandle(gg_cam_GameCameraH2) },
-                visibility: [gg_rct_PlayArea],
-                playArea: gg_rct_Battleground,
-            },
+            // "map2": {
+            //     name: "Map 2",
+            //     teamStartingPosition: { 0: Coords.fromWc3Unit(gg_unit_h01L_0017) , 1: Coords.fromWc3Unit(gg_unit_h01L_0018) },
+            //     teamCamera: { 0: CameraSetup.fromHandle(gg_cam_GameCameraH1), 1: CameraSetup.fromHandle(gg_cam_GameCameraH2) },
+            //     visibility: [gg_rct_PlayArea],
+            //     playArea: gg_rct_Battleground,
+            //     laneZones: { 
+            //         [Zones.Lane1]: { rectangles: [gg_rct_Lane_1], circles: [] },
+            //         [Zones.Lane2]: { rectangles: [gg_rct_Lane_2], circles: [] },
+            //         [Zones.Lane3]: { rectangles: [gg_rct_Lane_3], circles: [] },
+            //         [Zones.Lane4]: { rectangles: [gg_rct_Lane_4], circles: [] },
+            //         [Zones.Lane5]: { rectangles: [gg_rct_Lane_5], circles: [] },
+            //     },
+            // },
         },
         teamDamageRegion: {
             0: [gg_rct_Red_Damage_Line],

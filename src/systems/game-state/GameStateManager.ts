@@ -1,3 +1,4 @@
+import { Zones } from "content/constants/Zones";
 import { Coords } from "systems/coords/Coords"
 import { IEnumUnitService } from "systems/enum-service/IEnumUnitService";
 import { IHeroManager } from "systems/hero-manager/IHeroManager"
@@ -136,6 +137,15 @@ export class GameStateManager {
     private ExecuteBalanceDialog(): void {
         // If choiceBalanceSet is null, we have to show and select it
         if (this.choiceBalanceSet == null) {
+
+            // If there is only one choice, automatically choose
+            let balanceChoices = Object.keys(this.balanceSetChoices);
+            if (balanceChoices.length < 2) {
+                this.choiceBalanceSet = balanceChoices[0];
+                this.ExecuteGameState();
+                return;
+            }
+            
             if (this.balanceDialog == null) {
                 this.balanceDialog = new Dialog();
                 for (let k of Object.keys(this.unitBalanceSetChoices)) {
@@ -163,7 +173,7 @@ export class GameStateManager {
 
         this.gameState = 'unitBalanceDialog';
         Log.Info("Entering Game State: UnitBalanceDialog");
-        Log.Message("Game balance chosen: " + this.choiceBalanceSet);
+        Log.Message("Game balance chosen: " + this.balanceSetChoices[this.choiceBalanceSet].text);
         this.ExecuteGameState();
 
         // Reset balance choice
@@ -174,6 +184,14 @@ export class GameStateManager {
         // If choiceBalanceSet is null, we have to show and select it
         if (this.choiceUnitBalanceSet == null) {
             
+            // If there is only one choice, automatically choose
+            let unitBalanceChoices = Object.keys(this.unitBalanceSetChoices);
+            if (unitBalanceChoices.length < 2) {
+                this.choiceUnitBalanceSet = unitBalanceChoices[0];
+                this.ExecuteGameState();
+                return;
+            }
+
             let buttons: VoteDialogButtonInfo<string>[] = [];
             for (let k of Object.keys(this.balanceSetChoices)) {
                 let choice = this.balanceSetChoices[k];
@@ -199,7 +217,7 @@ export class GameStateManager {
 
         this.gameState = "mapDialog";
         Log.Info("Entering Game State: MapDialog");
-        Log.Message("Unit balance chosen: " + this.choiceUnitBalanceSet);
+        Log.Message("Unit balance chosen: " + this.unitBalanceSetChoices[this.choiceUnitBalanceSet].text);
         this.ExecuteGameState();
 
         // Reset balance choice
@@ -208,13 +226,19 @@ export class GameStateManager {
 
     private mapDialog: Dialog | null = null;
     private ExecuteMapDialog(): void {
+
         // If choiceMap is null, we have to show and select it
         if (this.choiceMap == null) {
-            if (Object.keys(this.mapChoices).length == 1) {
-                this.choiceMap = this.mapChoices[0];
+
+            // If there is only one choice, automatically choose
+            let mapChoices = Object.keys(this.mapChoices);
+            if (mapChoices.length < 2) {
+                this.choiceMapId = mapChoices[0];
+                this.choiceMap = this.mapChoices[this.choiceMapId];
                 this.ExecuteGameState();
                 return;
             }
+
             if (this.mapDialog == null) {
                 this.mapDialog = new Dialog();
                 for (let k of Object.keys(this.mapChoices)) {
@@ -243,7 +267,7 @@ export class GameStateManager {
         
         this.gameState = "setup";
         Log.Info("Entering Game State: Setup");
-        Log.Message("Map chosen: " + this.choiceMapId);
+        Log.Message("Map chosen: " + this.choiceMap.name);
         this.ExecuteGameState();
 
         // Reset balance choice
@@ -287,6 +311,17 @@ export class GameStateManager {
             SetCameraBoundsToRect(playArea);
             DestroyTimer(GetExpiredTimer());
         });
+
+        // Setting up lanes
+        for (let laneId of Object.keys(this.choiceMap.laneZones)) {
+            let zoneId = <Zones>Number(laneId);
+            let lane = this.choiceMap.laneZones[zoneId];
+            let rects: Rectangle[] = [];
+            for (let r of lane.rectangles) {
+                rects.push(Rectangle.fromHandle(r));
+            }
+            this.enumService.RegisterZone(zoneId, rects, lane.circles);
+        }
 
         this.teamDamage = {};
         for (let t of this.teamManager.teams) {
@@ -438,8 +473,13 @@ export class GameStateManager {
 }
 
 export type MapChoice = {
+    name: string,
     teamStartingPosition: Record<number, Coords>,
     teamCamera: Record<number, CameraSetup>,
     visibility: rect[],
     playArea: rect,
+    laneZones: Record<Zones, {
+        rectangles: rect[],
+        circles: Coords[]
+    }>
 }
