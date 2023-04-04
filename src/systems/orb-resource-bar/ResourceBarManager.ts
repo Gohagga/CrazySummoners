@@ -2,9 +2,10 @@ import { Log } from "systems/log/Log";
 import { MapPlayer } from "w3ts";
 import { OrbFactory } from "./OrbFactory";
 import { ResourceBar, ResourceBarConfig } from "./ResourceBar";
+import { GameBalanceId } from "content/constants/BalanceIds";
 
 export interface ResourceBarManagerConfig {
-    gameBalance: Record<string, ResourceBarConfig>
+    gameBalance: Record<GameBalanceId, ResourceBarConfig>
 }
 
 export class ResourceBarManager {
@@ -37,7 +38,9 @@ export class ResourceBarManager {
         if (this.instances[playerId]) {    
             this.instances[playerId].ResetOrbs();
         }
+        print("instances")
         this.instances[playerId] = new ResourceBar(player, this.orbFactory, this.gameBalance);
+        print("created rb")
 
         // Orb View register
         for (let c of this.onCreate) {

@@ -29,6 +29,9 @@ import { CameraSetup } from "w3ts";
 import { OrderId } from "w3ts/globals/order";
 import { HeroClass } from "../content/constants/HeroClass";
 import { RequirementType as Req } from '../content/constants/RequirementType'
+import { RedemptionAbilityData } from "content/spells/paladin/Redemption";
+import { GameBalanceId, UnitBalanceId } from "content/constants/BalanceIds";
+import { PaladinMasteryAbilityData } from "content/spells/paladin/PaladinMastery";
 
 const iconPath = "ReplaceableTextures/CommandButtons";
 
@@ -89,11 +92,11 @@ export class Config {
 
     gameStateManager: GameStateManagerConfig = {
         balanceSetChoices: {
-            "alpha1": { text: 'Alpha1', hotkey: 1 },
+            [GameBalanceId.Alpha1]: { text: 'Alpha1', hotkey: 1 },
             // "balance2": { text: 'Balance 2', hotkey: 2 },
         },
         unitBalanceSetChoices: {
-            "alpha1": { text: 'Alpha1', hotkey: 1 },
+            [UnitBalanceId.Alpha1]: { text: 'Alpha1', hotkey: 1 },
             // "balance2": { text: 'Balance 2', hotkey: 2 },
         },
         mapChoices: {
@@ -179,9 +182,9 @@ export class Config {
         ['R014']:       ['R014', [Req.White, Req.White, Req.Blue]],
         ['R013']:       ['R013', [Req.White, Req.White, Req.Purple]],
         ['R012']:       ['R012', [Req.Purple, Req.Red]],
-        ['R011']:       ['R011', [Req.White, Req.White, Req.Red, Req.Blue, Req.Mastery, Req.Mastery]],
-        ['R010']:       ['R010', [Req.White, Req.White, Req.Blue, Req.Purple, Req.Mastery, Req.Mastery]],
-        ['R00Z']:       ['R00Z', [Req.White, Req.White, Req.Red, Req.Purple, Req.Mastery, Req.Mastery]],
+        ['R011']:       ['R011', [Req.White, Req.White, Req.Red, Req.Blue, /*Req.Mastery, Req.Mastery*/]],
+        ['R010']:       ['R010', [Req.White, Req.White, Req.Blue, Req.Purple, /*Req.Mastery, Req.Mastery*/]],
+        ['R00Z']:       ['R00Z', [Req.White, Req.White, Req.Red, Req.Purple, /*Req.Mastery, Req.Mastery*/]],
         ['R00Y']:       ['R00Y', [Req.Purple, Req.Red]],
         ['R00X']:       ['R00X', [Req.Purple, Req.Summoning]],
         ['R00W']:       ['R00W', [Req.Blue]],
@@ -313,7 +316,7 @@ export class Config {
 
     resourceBarManager: ResourceBarManagerConfig = {
         gameBalance: {
-            'balance1': {
+            [GameBalanceId.Alpha1]: {
                 coloredOrbCooldown: 25,
                 summoningOrbCooldown: 25,
                 coloredMaxCount: 12,
@@ -324,7 +327,7 @@ export class Config {
 
     minionFactory: MinionFactoryConfig = {
         gameBalance: {
-            'balance1': {
+            [GameBalanceId.Alpha1]: {
                 maxLevel: 10,
                 maxEffectiveHp: 2500,
                 maxToMinRelativeValue: 25/15,
@@ -333,7 +336,7 @@ export class Config {
             }
         },
         unitBalance: {
-            'balance1': {
+            [UnitBalanceId.Alpha1]: {
                 unitTypeStatWeight: {
                     [Units.Woodcutter]: {
                         attack: {
@@ -937,7 +940,8 @@ export class Config {
                     },
                 }
             }
-        }
+        },
+        summonLevelAbilityCode: 'ALVL'
     }
 
     unitTypeService: UnitTypeServiceConfig = {
@@ -1066,6 +1070,17 @@ export class Config {
         damageSfxModel: 'StormfallOrange.mdl',
     }
 
+    redemption: RedemptionAbilityData = {
+        abilityCode: 'AP08',
+        orderId: OrderId.Phaseshifton,
+        orbCost: [OrbType.White, OrbType.White, OrbType.Red, OrbType.Blue],
+        name: '|cffffff80Redemption|r - 1',
+        tooltip: '',
+        castSfx: Models.CastRestoration,
+        healSfx: 'Abilities\\Spells\\Human\\Resurrect\\ResurrectCaster.mdl',
+        resurrectSfx: 'Abilities\\Spells\\Human\\Resurrect\\ResurrectCaster.mdl'
+    }
+
     summonMelee: SummonMeleeAbilityData = {
         abilityCode: 'A001',
         orderId: OrderId.Acidbomb,
@@ -1104,6 +1119,23 @@ export class Config {
             9: 'hR08',
             10: 'hR09',
         }
+    }
+
+    paladinMastery: PaladinMasteryAbilityData = {
+        abilityCode: 'A00F',
+        chooseMasterySpellbookCodeId: 'APMB',
+        choiceSpellCodeIds: {
+            restoration: 'A00A',
+            determination: 'A003',
+            repentance: 'A009',
+        },
+        masteryPassiveCodeIds: {
+            restoration: 'A00E',
+            determination: 'A00C',
+            repentance: 'A00D',
+        },
+        name: "",
+        orderId: 0
     }
     
     //#endregion

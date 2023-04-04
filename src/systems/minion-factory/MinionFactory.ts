@@ -1,18 +1,21 @@
+import { GameBalanceId, UnitBalanceId } from "content/constants/BalanceIds";
 import { Units } from "content/constants/Units";
-import { Coords } from "systems/coords/Coords";
+import { ICoords } from "systems/coords/ICoords";
 import { Log } from "systems/log/Log";
 import { MapPlayer, Unit } from "w3ts";
 
 export interface MinionFactoryConfig {
 
-    gameBalance: Record<string, GameBalanceDataBase>;
-    unitBalance: Record<string, UnitBalanceDataBase>;
+    gameBalance: Record<GameBalanceId, GameBalanceDataBase>;
+    unitBalance: Record<UnitBalanceId, UnitBalanceDataBase>;
+    summonLevelAbilityCode: string;
 }
 
 export class MinionFactory {
 
     private readonly gameBalances: Record<string, GameBalanceData> = {};
     private readonly unitBalances: Record<string, UnitBalanceData> = {};
+    private readonly summonLevelId: number;
 
     private gameBalance: GameBalanceData | null = null;
     private unitBalance: UnitBalanceData | null = null;
@@ -22,7 +25,10 @@ export class MinionFactory {
     constructor(
         config: MinionFactoryConfig,
     ) {
-        for (let unitBalanceId of Object.keys(config.unitBalance)) {
+        this.summonLevelId = FourCC(config.summonLevelAbilityCode);
+        
+        for (let unitBalanceCode of Object.keys(config.unitBalance)) {
+            let unitBalanceId = unitBalanceCode as UnitBalanceId;
             let unitBalance: UnitBalanceData = this.unitBalances[unitBalanceId] = {
                 unitTypeStatWeight: {}
             };
@@ -33,7 +39,8 @@ export class MinionFactory {
             }
         }
 
-        for (let gameBalanceId of Object.keys(config.gameBalance)) {
+        for (let gameBalanceCode of Object.keys(config.gameBalance)) {
+            let gameBalanceId = gameBalanceCode as GameBalanceId;
             let b = config.gameBalance[gameBalanceId];
             
             let minDps = b.minEffectiveHp / b.secondsToDie;
@@ -56,7 +63,7 @@ export class MinionFactory {
         }
     }
     
-    public CreateMinion(owner: MapPlayer, unitTypeId: number, level: number, location: Coords): Unit {
+    public CreateMinion(owner: MapPlayer, unitTypeId: number, level: number, location: ICoords): Unit {
 
         if (!this.gameBalance) Log.Error("Game balance not set.");
 
@@ -77,7 +84,14 @@ export class MinionFactory {
 
         u.removeGuardPosition();
 
+        u.addAbility(this.summonLevelId);
+        u.setAbilityLevel(this.summonLevelId, level);
+
         return u;
+    }
+
+    public GetMinionLevel(minion: Unit): number {
+        return minion.getAbilityLevel(this.summonLevelId);
     }
     
     public SetGameBalanceSet(id: string): void {

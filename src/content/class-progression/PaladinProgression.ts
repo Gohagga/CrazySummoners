@@ -1,5 +1,6 @@
 import { OrbType } from "content/constants/OrbType";
 import { Bless } from "content/spells/paladin/Bless";
+import { PaladinMastery } from "content/spells/paladin/PaladinMastery";
 import { ResourceBarManager } from "systems/orb-resource-bar/ResourceBarManager";
 import { UnitProgress } from "systems/player-progress/UnitProgress";
 import { ISkill } from "systems/skill-manager/ISkill";
@@ -19,6 +20,7 @@ export class PaladinProgression extends UnitProgress {
         protected abilities: PaladinAbilities,
         protected resourceBarManager: ResourceBarManager,
         protected skillManager: ISkillManager,
+        protected paladinMastery: PaladinMastery,
     ) {
         super(unit);
         this.owner = unit.owner;
@@ -35,6 +37,10 @@ export class PaladinProgression extends UnitProgress {
         bar.AddOrb(OrbType.White);
         bar.AddOrb(OrbType.White);
         bar.AddOrb(OrbType.Blue);
+
+        this.WaitForUnitLevel(11);
+        this.paladinMastery.AddHeroChooseMastery(this.unit);
+        this.unit.selectSkill(this.paladinMastery.id);
     }
 
     protected SetupSkills() {

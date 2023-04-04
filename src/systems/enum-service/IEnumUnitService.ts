@@ -15,6 +15,10 @@ export interface IEnumUnitService {
     EnumItemsInRange(originX: number, originY: number, radius: number, filter?: (target: Item, caster?: Unit) => boolean, source?: Unit): Item[];
 
     EnumUnitsInRect(rect: Rectangle, filter?: (target: Unit) => boolean, outResult?: Unit[]): Unit[];
+
+    EnumUnitsInZone(zoneId: number, filter?: (target: Unit) => boolean, outResult?: Unit[]): Unit[];
+    
+    RegisterZone(zoneId: number, rectangles: Rectangle[], circles: Coords[]): void;
 }
 
 export type ICoords = {

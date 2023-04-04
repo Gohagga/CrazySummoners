@@ -1,4 +1,6 @@
+import { GameBalanceId } from "content/constants/BalanceIds";
 import { Zones } from "content/constants/Zones";
+import { BattlegroundService } from "systems/battleground-service/BattlegroundService";
 import { Coords } from "systems/coords/Coords"
 import { IEnumUnitService } from "systems/enum-service/IEnumUnitService";
 import { IHeroManager } from "systems/hero-manager/IHeroManager"
@@ -13,7 +15,7 @@ type GameState = 'balanceDialog' | 'unitBalanceDialog' | 'mapDialog' | 'setup' |
 
 export interface GameStateManagerConfig {
     // First, select game balance set
-    balanceSetChoices: Record<string, { text: string, hotkey: number }>,
+    balanceSetChoices: Record<GameBalanceId, { text: string, hotkey: number }>,
     // Then unit balance
     unitBalanceSetChoices: Record<string, { text: string, hotkey: number }>,
     // Then select map
@@ -53,6 +55,7 @@ export class GameStateManager {
         private readonly resourceBarManager: ResourceBarManager,
         private readonly voteDialogService: VoteDialogService,
         private readonly enumService: IEnumUnitService,
+        private readonly battlegroundService: BattlegroundService
     ) {
         this.balanceSetChoices = config.balanceSetChoices;
         this.unitBalanceSetChoices = config.unitBalanceSetChoices;
@@ -148,8 +151,8 @@ export class GameStateManager {
             
             if (this.balanceDialog == null) {
                 this.balanceDialog = new Dialog();
-                for (let k of Object.keys(this.unitBalanceSetChoices)) {
-                    let choice = this.unitBalanceSetChoices[k];
+                for (let k of Object.keys(this.balanceSetChoices)) {
+                    let choice = this.balanceSetChoices[k];
                     let button = this.balanceDialog.addButton(choice.text, choice.hotkey, false, false);
                     
                     let balanceSetId = k;
@@ -230,11 +233,16 @@ export class GameStateManager {
         // If choiceMap is null, we have to show and select it
         if (this.choiceMap == null) {
 
+            let chooseMap = (mapChoiceId: string) => {
+                this.choiceMapId = mapChoiceId;
+                this.choiceMap = this.mapChoices[this.choiceMapId];
+                this.battlegroundService.SetMap(this.choiceMapId);
+            };
+
             // If there is only one choice, automatically choose
             let mapChoices = Object.keys(this.mapChoices);
             if (mapChoices.length < 2) {
-                this.choiceMapId = mapChoices[0];
-                this.choiceMap = this.mapChoices[this.choiceMapId];
+                chooseMap(mapChoices[0]);
                 this.ExecuteGameState();
                 return;
             }
@@ -250,8 +258,7 @@ export class GameStateManager {
                     let t = new Trigger();
                     t.registerDialogButtonEvent(button);
                     t.addAction(() => {
-                        this.choiceMapId = mapId;
-                        this.choiceMap = mapChoice;
+                        chooseMap(mapId);
                     this.ExecuteGameState();
                     });
                 }
@@ -370,7 +377,11 @@ export class GameStateManager {
         
         // Reset resource bars
         for (let p of this.teamManager.players) {
-            this.resourceBarManager.Get(p.id).ResetCooldowns(countdown);
+            print("P", p.name)
+            let rb = this.resourceBarManager.Get(p.id);
+            print("2")
+            rb.ResetCooldowns(countdown);
+            print("after p");
         }
 
         // Remove hero selectors

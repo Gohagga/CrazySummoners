@@ -1,5 +1,5 @@
 import { Log } from "systems/log/Log";
-import { Destructable, Item, Rectangle, Unit } from "w3ts/index";
+import { Destructable, Item, Rectangle, Region, Unit } from "w3ts/index";
 import { Coords } from "../coords/Coords";
 import { IEnumUnitService } from "./IEnumUnitService";
 
@@ -7,6 +7,8 @@ export class EnumUnitService implements IEnumUnitService {
 
     group: group = CreateGroup();
     rect: Rectangle = new Rectangle(0, 0, 100, 100);
+
+    private readonly zones: Record<number, { rectangles: Rectangle[], circles: Coords[] }> = {};
 
     EnumItemsInRange(originX: number, originY: number, radius: number, filter?: (target: Item, caster?: Unit) => boolean, source?: Unit): Item[] {
         
@@ -115,5 +117,55 @@ export class EnumUnitService implements IEnumUnitService {
             }
         }
         return outResult;
+    }
+    
+    EnumUnitsInZone(zoneId: number, filter?: ((target: Unit) => boolean) | undefined, outResult?: Unit[] | undefined): Unit[] {
+        if (!outResult) outResult = [];
+
+        let zone = this.zones[zoneId];
+        if (!zone) throw Log.Error("Zone '" + zoneId.toString() + "' is not registered.");
+
+        let u: unit | null;
+
+        // First get all units inside the rectangles
+        for (let rect of zone.rectangles) {
+            GroupEnumUnitsInRect(this.group, rect.handle, null);
+            while ((u = FirstOfGroup(this.group)) != null) {
+                GroupRemoveUnit(this.group, u);
+                let U = Unit.fromHandle(u);
+                if (!filter || filter(U)) {
+                    outResult.push(U);
+                }
+            }
+        }
+
+        // Then get all the units inside the circles
+        for (let circle of zone.circles) {
+            let x = circle.x;
+            let y = circle.y;
+            let radius = circle.z;
+            
+            GroupEnumUnitsInRange(this.group, x, y, radius + 100, null);
+            while ((u = FirstOfGroup(this.group)) != null) {
+                GroupRemoveUnit(this.group, u);
+                if (!IsUnitInRangeXY(u, x, y, radius)) continue;
+
+                let U = Unit.fromHandle(u);
+                if (!filter) {
+                    outResult.push(U);
+                }
+            }
+        }
+
+        return outResult;
+    }
+
+    RegisterZone(zoneId: number, rectangles: Rectangle[], circles: Coords[]) {
+        let zone: { rectangles: Rectangle[], circles: Coords[] } = {
+            rectangles: rectangles,
+            circles: circles,
+        };
+
+        this.zones[zoneId] = zone;
     }
 }

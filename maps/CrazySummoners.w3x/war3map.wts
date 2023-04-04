@@ -23387,3 +23387,9 @@ STRING 6721
 TeamStartingPosition
 }
 
+STRING 6722
+// Abilities: ALVL (Summon Level), Name (Name)
+{
+Summon Level
+}
+

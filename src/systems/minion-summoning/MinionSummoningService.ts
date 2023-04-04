@@ -5,7 +5,7 @@ import { AiState } from "systems/minion-ai/AiState";
 import { MinionAiManager } from "systems/minion-ai/MinionAiManager";
 import { MinionFactory } from "systems/minion-factory/MinionFactory";
 import { TeamManager } from "systems/team-manager/TeamManager";
-import { Rectangle, Timer, Unit } from "w3ts";
+import { MapPlayer, Rectangle, Timer, Unit } from "w3ts";
 import { OrderId } from "w3ts/globals/order";
 
 export interface MinionSummoningServiceConfig {
@@ -91,20 +91,61 @@ export class MinionSummoningService {
         return true;
     }
 
+    public ReviveSummon(summoner: Unit, whichUnit: Unit, owner?: MapPlayer): Unit {
+        
+        if (!owner) owner = whichUnit.owner;
+
+        let team = this.teamManager.GetPlayerTeam(summoner.owner);
+        owner = (team && team.teamOwner) || summoner.owner;
+
+        print(whichUnit.level, "level");
+        let lvl = this.minionFactory.GetMinionLevel(whichUnit);
+        let revived = this.minionFactory.CreateMinion(owner, whichUnit.typeId, lvl, whichUnit.point);
+        let flipCrystals = !owner.isPlayerAlly(whichUnit.owner);        
+
+        let aiState = this.minionAiManager.Get(whichUnit.id);
+        aiState = {
+            destination: aiState.destination,
+            origin: aiState.origin,
+            unit: revived,
+            Update: aiState.Update
+        }
+        if (flipCrystals) {
+            let origin = aiState.origin;
+            aiState.origin = aiState.destination;
+            aiState.destination = origin;
+        }
+        
+        this.minionAiManager.Register(aiState);
+        this.minionAiManager.Unregister(whichUnit.id);
+
+        revived.facing = whichUnit.facing;
+        revived.mana = whichUnit.mana;
+        revived.life = 1;
+        
+        whichUnit.destroy();
+        return revived;
+    }
+
     CreateDefaultAiState(minion: Unit, origin: Coords, destination: Coords, ai: (unit: Unit) => boolean): AiState {
         let aiState: AiState = {
             unit: minion,
-            Update: () => {
+            origin: origin,
+            destination: destination,
+            Update: (data: AiState) => {
+
+                if (!data.unit.handle) return false;
 
                 // If unit is busy, don't do anything
-                if (minion.currentOrder != 0) return true;
+                if (data.unit.currentOrder != 0) return true;
 
                 // If not feared
-                minion.issueOrderAt(OrderId.Attack, destination.x, destination.y);
+                print("issuing order");
+                data.unit.issueOrderAt(OrderId.Attack, data.destination.x, data.destination.y);
                 // If feared
                 // minion.issueOrderAt(OrderId.Move, origin.x, origin.y);
 
-                return ai(minion);
+                return ai(data.unit);
             },
         };
         return aiState;

@@ -1,0 +1,1 @@
+export type ICoords = { x: number, y: number };

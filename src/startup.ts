@@ -44,6 +44,10 @@ import { Invigorate } from "content/spells/paladin/Invigorate";
 import { Endure } from "content/spells/paladin/Endure";
 import { Justice } from "content/spells/paladin/Justice";
 import { CheatCommands } from "systems/cheat-commands/CheatCommands";
+import { Redemption } from "content/spells/paladin/Redemption";
+import { PaladinMastery } from "content/spells/paladin/PaladinMastery";
+import { BattlegroundService } from "systems/battleground-service/BattlegroundService";
+import { GameEffectsService } from "systems/game-effects/GameEffectsService";
 
 export function initializeGame() {
 
@@ -110,10 +114,12 @@ export function initializeGame() {
     const teamManager = new TeamManager(players, teams);
     const skillManager = new SkillManager();
     const dummyUnitManager = new DummyUnitManager(config.dummyUnitManager);
+    const battlegroundService = new BattlegroundService(config.gameStateManager.mapChoices);
 
     const minionSummoningService = new MinionSummoningService(config.minionSummoning, minionFactory, enumService, teamManager, new MinionAiManager());
     const spellcastingService = new SpellcastingService(config.spellcastingService, interruptableService);
     const dummyAbilityFactory = new DummyAbilityFactory(dummyUnitManager);
+    const gammeEffectsService = new GameEffectsService(minionSummoningService);
 
     //#region Spells
     const abl = {
@@ -123,24 +129,31 @@ export function initializeGame() {
         invigorate: new Invigorate(config.invigorate, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory, unitTypeService),
         endure: new Endure(config.endure, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory),
         justice: new Justice(config.justice, abilityEvent, resourceBarManager, spellcastingService),
+        redemption: new Redemption(config.redemption, abilityEvent, resourceBarManager, spellcastingService, enumService, battlegroundService, gammeEffectsService),
         
         summonMelee: new SummonMelee(config.summonMelee, abilityEvent, minionSummoningService, resourceBarManager),
         summonRanged: new SummonRanged(config.summonRanged, abilityEvent, minionSummoningService, resourceBarManager),
     }
+
+    let paladinMastery = new PaladinMastery(config.paladinMastery, abilityEvent, {
+        restoration: [abl.rejuvenate, abl.invigorate],
+        determination: [abl.bless, abl.endure],
+        repentance: [abl.purge, abl.justice]
+    });
     //#endregion
 
     // Shop
     const arcaneTomeShop = new ArcaneTomeShop(config.arcaneTomeShop, resourceBarManager);
 
     const heroManager = new HeroManager<HeroClass>(config.heroManagerConfig, {
-        [HeroClass.Paladin]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager),
-        [HeroClass.Warlock]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager),
-        [HeroClass.Elementalist]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager),
-        [HeroClass.Inquisitor]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager),
-        [HeroClass.DeathKnight]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager),
+        [HeroClass.Paladin]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager, paladinMastery),
+        [HeroClass.Warlock]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager, paladinMastery),
+        [HeroClass.Elementalist]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager, paladinMastery),
+        [HeroClass.Inquisitor]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager, paladinMastery),
+        [HeroClass.DeathKnight]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager, paladinMastery),
     });
     
-    const gameStateManager = new GameStateManager(config.gameStateManager, heroManager, minionFactory, teamManager, resourceBarManager, voteDialogService, enumService);
+    const gameStateManager = new GameStateManager(config.gameStateManager, heroManager, minionFactory, teamManager, resourceBarManager, voteDialogService, enumService, battlegroundService);
     
     // UI
     let orbsView = GenerateOrbView(config.orbView, Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0));
