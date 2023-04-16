@@ -44,6 +44,33 @@ export class CastBar extends ProgressBar {
         return this;
     }
 
+    public ChannelSpell(spellId: number, channelTime: number, callback?: (bar: CastBar) => void): CastBar {
+        this.curValue = 100;
+        this.endValue = 0;
+        this.reverse = true;
+        this.speed = (1 / channelTime);
+        if (callback) this.onDone = () => callback(this);
+
+        BlzSetSpecialEffectTime(this.sfx, 100);
+
+        if (this.done) {
+            this._isDone = false;
+            TimerStart(this.timer2, 0.01, true, () => 
+            {
+                if (!this.alive) {
+                    this.Destroy();
+                }
+                this.UpdatePercentage();
+            });
+
+            if (spellId) CastBar.instance[this.unit.id] = spellId;
+
+            if (channelTime < 0.15) DestroyEffect(this.sfx);
+        }
+
+        return this;
+    }
+
     public static GetUnitCurrentSpellId(unit: unit): number {
         const unitId = GetHandleId(unit);
         if (unitId in CastBar.instance) {

@@ -119,4 +119,41 @@ export class SpellcastingService {
 
         return castBar;
     }
+
+    ChannelSpell(unit: Unit, spellId: number, channelTime: number, afterFinish: (bar: CastBar) => void, onInterupt?: (orderId: number, castBar: CastBar) => boolean) {
+        let castBar = new CastBar(unit, this.sfxModelPath, this.updatePeriod, this.castBarSize, spellId, this.defaultHeight);
+        let unitId = unit.id;
+        this.castBars[unitId] = castBar;
+        castBar.ChannelSpell(spellId, channelTime, bar => {
+            bar.Destroy();
+            afterFinish(bar);
+            // if (this.orderQueueService.ResolveQueuedOrder(unit)) {
+            //     return;
+            // }
+        });
+
+        if (onInterupt) this.interruptableService.Register(unit.handle, (orderId: number) => {
+            return onInterupt(orderId, castBar);
+        });
+        else {
+            this.interruptableService.Register(unit.handle, (orderId: number) => {
+    
+                // if (orderId == OrderId.Move
+                //     || orderId == OrderId.Smart
+                //     || orderId == OrderId.Attack
+                //     || orderId == OrderId.Stop
+                //     || orderId == OrderId.Holdposition)
+                //     return false;
+
+                castBar.alive = false;
+
+                if (castBar.isDone)
+                    return false;
+                
+                return true;
+            });
+        }
+
+        return castBar;
+    }
 }

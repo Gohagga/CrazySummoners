@@ -99,7 +99,7 @@ export class Rejuvenate extends OrbAbility {
             }
         });
 
-        this.spellcastingService.CastSpell(caster, this.id, data.channelTime, cb => {
+        this.spellcastingService.ChannelSpell(caster, this.id, data.channelTime, cb => {
             cb.Finish();
             castSfx.destroy();
             healTimer.destroy();
