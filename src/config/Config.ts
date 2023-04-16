@@ -32,6 +32,8 @@ import { RequirementType as Req } from '../content/constants/RequirementType'
 import { RedemptionAbilityData } from "content/spells/paladin/Redemption";
 import { GameBalanceId, UnitBalanceId } from "content/constants/BalanceIds";
 import { PaladinMasteryAbilityData } from "content/spells/paladin/PaladinMastery";
+import { GuardianAngelAbilityData } from "content/spells/paladin/GuardianAngel";
+import { ExorcismAbilityData } from "content/spells/paladin/Exorcism";
 
 const iconPath = "ReplaceableTextures/CommandButtons";
 
@@ -112,6 +114,7 @@ export class Config {
                     [Zones.Lane3]: { rectangles: [gg_rct_Lane_3], circles: [] },
                     [Zones.Lane4]: { rectangles: [gg_rct_Lane_4], circles: [] },
                     [Zones.Lane5]: { rectangles: [gg_rct_Lane_5], circles: [] },
+                    [Zones.Battleground]: { rectangles: [gg_rct_Battleground], circles: [] },
                 },
             },
             // "map2": {
@@ -1079,6 +1082,30 @@ export class Config {
         castSfx: Models.CastRestoration,
         healSfx: 'Abilities\\Spells\\Human\\Resurrect\\ResurrectCaster.mdl',
         resurrectSfx: 'Abilities\\Spells\\Human\\Resurrect\\ResurrectCaster.mdl'
+    }
+
+    guardianAngel: GuardianAngelAbilityData = {
+        abilityCode: 'AP09',
+        orderId: OrderId.Phoenixmorph,
+        orbCost: [OrbType.White, OrbType.White, OrbType.Blue, OrbType.Purple],
+        name: '|cffffff80Guardian Angel|r - 1',
+        tooltip: '',
+        castSfx: Models.CastDetermination,
+        effectSfx: 'Abilities\\Spells\\Human\\Resurrect\\ResurrectCaster.mdl',
+        auraArmorCodeId: 'A004',
+        auraArmorBuffCodeId: 'B005',
+    }
+
+    exorcism: ExorcismAbilityData = {
+        abilityCode: 'AP07',
+        orderId: OrderId.Poisonarrows,
+        orbCost: [OrbType.White, OrbType.White, OrbType.Red, OrbType.Purple],
+        name: '|cffffff80Exorcism|r - 1',
+        tooltip: '',
+        castSfx: Models.CastRepentance,
+        killSfx: 'Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdl',
+        damageSfx: 'Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl',
+        damageTickDuration: 1,
     }
 
     summonMelee: SummonMeleeAbilityData = {

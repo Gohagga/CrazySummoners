@@ -21,8 +21,8 @@ export class UnitTypeService {
     }
 
     private GetUnitType(unitOrTypeId: Unit | number): UnitType {
-        if (typeof(unitOrTypeId) == 'number') return this.classificationService.Get(unitOrTypeId);
-        return this.classificationService.Get(unitOrTypeId.typeId);
+        if (typeof(unitOrTypeId) == 'number') return this.classificationService.Get(unitOrTypeId) || UnitType.Untyped;
+        return this.classificationService.Get(unitOrTypeId.typeId) || UnitType.Untyped;
     }
 
     public IsUndead(unit: Unit): boolean;

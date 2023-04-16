@@ -8,6 +8,7 @@ export class BattlegroundService {
     private activeMapId: string | null = null;
     private zoneRegion: Record<Zones, Region> | null = null;
     private mapChoice: MapChoice | null = null;
+    private playArea: Rectangle | null = null;
 
     constructor(
         private readonly mapChoices: Record<string, MapChoice>,
@@ -24,7 +25,8 @@ export class BattlegroundService {
             [Zones.Lane2]: new Region,
             [Zones.Lane3]: new Region,
             [Zones.Lane4]: new Region,
-            [Zones.Lane5]: new Region
+            [Zones.Lane5]: new Region,
+            [Zones.Battleground]: new Region(),
         };
         
         for (let zoneIdCode of Object.keys(this.mapChoice.laneZones)) {
@@ -36,6 +38,7 @@ export class BattlegroundService {
             }
         }
         this.zoneRegion = zoneRegion;
+        this.playArea = Rectangle.fromHandle(this.mapChoice.playArea);
     }
 
     public GetUnitZone(unit: Unit) : Zones | null {
@@ -60,6 +63,11 @@ export class BattlegroundService {
         }
 
         return null;
+    }
+
+    public GetPlayAreaRect(): Rectangle {
+        if (!this.playArea) throw "map choice has not been set";
+        return this.playArea;
     }
 
     public UpdateBattleground() {

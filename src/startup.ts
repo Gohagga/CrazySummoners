@@ -48,11 +48,14 @@ import { Redemption } from "content/spells/paladin/Redemption";
 import { PaladinMastery } from "content/spells/paladin/PaladinMastery";
 import { BattlegroundService } from "systems/battleground-service/BattlegroundService";
 import { GameEffectsService } from "systems/game-effects/GameEffectsService";
+import { GuardianAngel } from "content/spells/paladin/GuardianAngel";
+import { Exorcism } from "content/spells/paladin/Exorcism";
 
 export function initializeGame() {
 
     let config = new Config();
     Log.Level = Level.Error;
+    Log.ShowOnlyToPlayer = Player(0);
 
     const players: MapPlayer[] = [
         MapPlayer.fromIndex(0)
@@ -130,6 +133,8 @@ export function initializeGame() {
         endure: new Endure(config.endure, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory),
         justice: new Justice(config.justice, abilityEvent, resourceBarManager, spellcastingService),
         redemption: new Redemption(config.redemption, abilityEvent, resourceBarManager, spellcastingService, enumService, battlegroundService, gammeEffectsService),
+        guardianAngel: new GuardianAngel(config.guardianAngel, abilityEvent, resourceBarManager, spellcastingService, enumService, battlegroundService, gammeEffectsService, dummyUnitManager),
+        exorcism: new Exorcism(config.exorcism, abilityEvent, resourceBarManager, spellcastingService, enumService, unitTypeService),
         
         summonMelee: new SummonMelee(config.summonMelee, abilityEvent, minionSummoningService, resourceBarManager),
         summonRanged: new SummonRanged(config.summonRanged, abilityEvent, minionSummoningService, resourceBarManager),

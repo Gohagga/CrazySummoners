@@ -4,4 +4,5 @@ export const enum Zones {
     Lane3 = 3,
     Lane4 = 4,
     Lane5 = 5,
+    Battleground = 10,
 }

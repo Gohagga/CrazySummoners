@@ -10,7 +10,7 @@ export class ClassificationService<ClassificationType> {
         this.typeClass[typeId] = value;
     }
 
-    public Get(typeId: number): ClassificationType {
-        return this.typeClass[typeId];
+    public Get(typeId: number): ClassificationType | null {
+        return this.typeClass[typeId] || null;
     }
 }

@@ -1,6 +1,7 @@
 import { Log } from "systems/log/Log";
 import { Unit, MapPlayer } from "w3ts";
 import { IDummyUnitManager } from "./interfaces/IDummyUnitManager";
+import { ICoords } from "systems/coords/ICoords";
 
 export interface DummyUnitManagerConfig {
     dummyUnitCodeId: string,
@@ -18,6 +19,15 @@ export class DummyUnitManager implements IDummyUnitManager {
     ) {
         this.dummyTypeId = FourCC(config.dummyUnitCodeId);
         this.dummyOwner = MapPlayer.fromIndex(config.dummyUnitOwnerPlayerId);
+    }
+
+    CreateDummy(x: number, y: number, owner?: MapPlayer, face?: number): Unit {
+        owner ||= this.dummyOwner;
+        face ||= 0;
+
+        let dummy = new Unit(owner, this.dummyTypeId, x, y, face);
+        dummy.removeGuardPosition();
+        return dummy;
     }
 
     GetDummy(): Unit {

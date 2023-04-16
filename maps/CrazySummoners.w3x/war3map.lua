@@ -68,7 +68,7 @@ local unitID
 local t
 local life
 
-u = BlzCreateUnitWithSkin(p, FourCC("nDUM"), -4042.9, -5227.6, 321.129, FourCC("nDUM"))
+u = BlzCreateUnitWithSkin(p, FourCC("nDUM"), -4042.9, -5227.6, 321.130, FourCC("nDUM"))
 u = BlzCreateUnitWithSkin(p, FourCC("nDUM"), -5254.4, -3635.6, 30.323, FourCC("nDUM"))
 u = BlzCreateUnitWithSkin(p, FourCC("nDUM"), -2926.4, -3639.3, 124.402, FourCC("nDUM"))
 u = BlzCreateUnitWithSkin(p, FourCC("nDUM"), -4037.7, -2094.0, 287.060, FourCC("nDUM"))
