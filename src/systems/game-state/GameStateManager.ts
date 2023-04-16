@@ -377,11 +377,8 @@ export class GameStateManager {
         
         // Reset resource bars
         for (let p of this.teamManager.players) {
-            print("P", p.name)
             let rb = this.resourceBarManager.Get(p.id);
-            print("2")
             rb.ResetCooldowns(countdown);
-            print("after p");
         }
 
         // Remove hero selectors

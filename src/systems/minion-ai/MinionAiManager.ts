@@ -45,8 +45,6 @@ export class MinionAiManager {
             let state = this.states[i];
             let unitId = state.unit.id;
 
-            print(i);
-
             if (this.units.has(unitId) == false) {
                 remains = false;
             } else {

@@ -38,9 +38,7 @@ export class ResourceBarManager {
         if (this.instances[playerId]) {    
             this.instances[playerId].ResetOrbs();
         }
-        print("instances")
         this.instances[playerId] = new ResourceBar(player, this.orbFactory, this.gameBalance);
-        print("created rb")
 
         // Orb View register
         for (let c of this.onCreate) {

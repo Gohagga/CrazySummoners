@@ -98,7 +98,6 @@ export class MinionSummoningService {
         let team = this.teamManager.GetPlayerTeam(summoner.owner);
         owner = (team && team.teamOwner) || summoner.owner;
 
-        print(whichUnit.level, "level");
         let lvl = this.minionFactory.GetMinionLevel(whichUnit);
         let revived = this.minionFactory.CreateMinion(owner, whichUnit.typeId, lvl, whichUnit.point);
         let flipCrystals = !owner.isPlayerAlly(whichUnit.owner);        
@@ -140,7 +139,6 @@ export class MinionSummoningService {
                 if (data.unit.currentOrder != 0) return true;
 
                 // If not feared
-                print("issuing order");
                 data.unit.issueOrderAt(OrderId.Attack, data.destination.x, data.destination.y);
                 // If feared
                 // minion.issueOrderAt(OrderId.Move, origin.x, origin.y);

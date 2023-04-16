@@ -17,6 +17,7 @@ export const enum LogColor {
 export class Log {
     
     public static Level = Level.Info;
+    public static ShowOnlyToPlayer: player | null = null;
     
     static Message(...msg: any[]) {
         if (Number(this.Level) > Number(Level.Message)) return;
@@ -25,16 +26,19 @@ export class Log {
 
     public static Info(...msg: any[]) {
         if (Number(this.Level) > Number(Level.Info)) return;
+        if (this.ShowOnlyToPlayer && GetLocalPlayer() != this.ShowOnlyToPlayer) return;
         print(...msg);
     }
 
     public static Debug(...msg: any[]) {
         if (Number(this.Level) > Number(Level.Debug)) return;
+        if (this.ShowOnlyToPlayer && GetLocalPlayer() != this.ShowOnlyToPlayer) return;
         print(...msg);
     }
 
     public static Error<Type extends new (...a: any[]) => any>(msgOrType: Type | string | number, ...msg: (string | number)[]) {
         if (Number(this.Level) > Number(Level.Error)) return;
+        if (this.ShowOnlyToPlayer && GetLocalPlayer() != this.ShowOnlyToPlayer) return;
 
         let prefix: string = LogColor.Error;
         if (typeof(msgOrType) == 'object') prefix += '<' + (msgOrType as new () => any).name + '>';
