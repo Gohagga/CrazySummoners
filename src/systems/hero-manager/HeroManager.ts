@@ -27,10 +27,11 @@ export class HeroManager<HeroClass extends number> implements IHeroManager {
     private readonly heroShopUnitTypeId: number;
 
     private readonly onHeroSelected: (() => void)[] = [];
+    public afterHeroSelectedHook: (hero: Unit) => void = () => {};
     
     constructor(
         config: HeroManagerConfig<HeroClass>,
-        private readonly heroProgressFactory: Record<HeroClass, (u: Unit) => UnitProgress>,
+        private readonly heroProgressFactory: Record<HeroClass, (u: Unit) => UnitProgress>
     ) {
         for (let k of Object.keys(config.heroDefs)) {
             let heroClass = <HeroClass>(Number(k));
@@ -97,8 +98,8 @@ export class HeroManager<HeroClass extends number> implements IHeroManager {
             
             this.playerHero[playerId] = sold;
             SelectUnitForPlayerSingle(sold.handle, owner.handle);
-            // TODO: Remove this
-            sold.setHeroLevel(20, true);
+            
+            this.afterHeroSelectedHook(sold);
 
             Log.Message(owner.name + " has selected " + sold.name + "!");
 

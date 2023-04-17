@@ -1,6 +1,9 @@
 import { OrbType } from "content/constants/OrbType";
 import { Bless } from "content/spells/paladin/Bless";
 import { PaladinMastery } from "content/spells/paladin/PaladinMastery";
+import { WhitePower } from "content/spells/paladin/WhitePower";
+import { IGameStateEventHandler } from "systems/game-state/IGameStateEventHandler";
+import { Delay } from "systems/helpers/Delay";
 import { ResourceBarManager } from "systems/orb-resource-bar/ResourceBarManager";
 import { UnitProgress } from "systems/player-progress/UnitProgress";
 import { ISkill } from "systems/skill-manager/ISkill";
@@ -8,7 +11,8 @@ import { ISkillManager } from "systems/skill-manager/ISkillManager";
 import { MapPlayer, Unit } from "w3ts";
 
 export type PaladinAbilities = {
-    bless: Bless
+    bless: Bless,
+    whitePower: WhitePower,
 }
 
 export class PaladinProgression extends UnitProgress {
@@ -17,12 +21,13 @@ export class PaladinProgression extends UnitProgress {
 
     constructor(
         protected unit: Unit,
+        protected gameStateEvent: IGameStateEventHandler,
         protected abilities: PaladinAbilities,
         protected resourceBarManager: ResourceBarManager,
         protected skillManager: ISkillManager,
         protected paladinMastery: PaladinMastery,
     ) {
-        super(unit);
+        super(unit, gameStateEvent);
         this.owner = unit.owner;
     }
 
@@ -31,16 +36,24 @@ export class PaladinProgression extends UnitProgress {
         this.SetupSkills();
 
         let bar = this.resourceBarManager.Create(this.owner);
-        bar.AddOrb(OrbType.Summoning);
-        bar.AddOrb(OrbType.Summoning);
-        bar.AddOrb(OrbType.White);
-        bar.AddOrb(OrbType.White);
-        bar.AddOrb(OrbType.White);
-        bar.AddOrb(OrbType.Blue);
+        Delay
+            .Call(0.2, () => bar.AddOrb(OrbType.Summoning))
+            .Then(0.2, () => bar.AddOrb(OrbType.Summoning))
+            .Then(0.2, () => bar.AddOrb(OrbType.White))
+            .Then(0.2, () => bar.AddOrb(OrbType.White))
+            .Then(0.2, () => bar.AddOrb(OrbType.White))
+            .Then(0.2, () => bar.AddOrb(OrbType.Blue));
 
-        this.WaitForUnitLevel(11);
+        let wps = this.abilities.whitePower.CreateStacksItem(this.unit);
+        
+        this.WaitForGameStart();
+        this.abilities.whitePower.StartChargeUp(this.unit, 1, wps);
+
+        this.WaitForUnitLevel(6);
         this.paladinMastery.AddHeroChooseMastery(this.unit);
         this.unit.selectSkill(this.paladinMastery.id);
+
+        this.WaitForUnitLevel(7);
     }
 
     protected SetupSkills() {

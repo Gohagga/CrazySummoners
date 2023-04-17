@@ -23,7 +23,11 @@ export abstract class OrbAbility extends AbilityBase {
         
         this.textRenderer = TextRendererFactory.Create();
         this.orbCost = data.orbCost;
-        this.tooltipCost = OrbCostToString(data.orbCost) + '\n\n';
+        
+        if (data.orbCost.length > 0)
+            this.tooltipCost = OrbCostToString(data.orbCost) + '\n\n';
+        else
+            this.tooltipCost = '';
 
         BlzSetAbilityTooltip(this.id, data.name, 0);
         if (data.tooltip) BlzSetAbilityExtendedTooltip(this.id, this.textRenderer.Render(this.tooltipCost + data.tooltip), 0);
@@ -35,11 +39,6 @@ export abstract class OrbAbility extends AbilityBase {
         if (name) name = this.textRenderer.Render(name);
         super.UpdateUnitAbilityBase(unit, tooltip, cost, cooldown, undefined, castTime);
     }
-
-    protected SetFollowThrough(unit: Unit, level: number, value: number) {
-        BlzSetAbilityRealLevelField(unit.getAbility(this.id), ABILITY_RLF_FOLLOW_THROUGH_TIME, level - 1, value);
-    }
-
 }
 
 function OrbCostToString(cost: OrbType[]) {

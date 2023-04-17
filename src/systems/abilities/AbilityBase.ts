@@ -51,4 +51,13 @@ export abstract class AbilityBase implements ISkill {
     RemoveFromUnit(unit: Unit): boolean {
         return unit.removeAbility(this.addId);
     }
+
+    // Additional wrappers
+    protected SetFollowThrough(unit: Unit, level: number, value: number) {
+        BlzSetAbilityRealLevelField(unit.getAbility(this.id), ABILITY_RLF_FOLLOW_THROUGH_TIME, level - 1, value);
+    }
+
+    protected SetCooldown(unit: Unit, level: number, value: number) {
+        BlzSetAbilityRealLevelField(unit.getAbility(this.id), ABILITY_RLF_COOLDOWN, level - 1, value);
+    }
 }

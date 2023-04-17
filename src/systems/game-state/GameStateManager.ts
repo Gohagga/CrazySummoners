@@ -10,6 +10,7 @@ import { ResourceBarManager } from "systems/orb-resource-bar/ResourceBarManager"
 import { TeamManager } from "systems/team-manager/TeamManager";
 import { VoteDialogButtonInfo, VoteDialogService } from "systems/vote-dialog-service/VoteDialogService";
 import { Camera, CameraSetup, Dialog, FogModifier, MapPlayer, Rectangle, Region, Timer, Trigger, Unit } from "w3ts";
+import { GameStateEventType, IGameStateEventHandler } from "./IGameStateEventHandler";
 
 type GameState = 'balanceDialog' | 'unitBalanceDialog' | 'mapDialog' | 'setup' | 'heroSelection' | 'playing' | 'roundEnd';
 
@@ -37,6 +38,7 @@ export class GameStateManager {
     private readonly unitsNotToRemove: Set<number> = new Set<number>();
     private readonly mapPlayerFogModifier: Record<string, Record<number, FogModifier[]>> = {};
     private readonly heroSelectorUnits: Unit[] = [];
+    private readonly expPeriodicTrigger: Trigger;
     
     private gameState: GameState = 'balanceDialog';
     private choiceBalanceSet: string | null = null;
@@ -44,6 +46,7 @@ export class GameStateManager {
     private choiceMap: MapChoice | null = null;
     private choiceMapId: string | null = null;
     private teamDamageTriggers: Record<number, Trigger> = {};
+    private expGainPerGameTick = 1;
 
     private teamDamage: Record<number, number> = {};
 
@@ -55,14 +58,16 @@ export class GameStateManager {
         private readonly resourceBarManager: ResourceBarManager,
         private readonly voteDialogService: VoteDialogService,
         private readonly enumService: IEnumUnitService,
-        private readonly battlegroundService: BattlegroundService
+        private readonly battlegroundService: BattlegroundService,
+        private readonly players: MapPlayer[],
+        private readonly gameStateEvent: IGameStateEventHandler
     ) {
         this.balanceSetChoices = config.balanceSetChoices;
         this.unitBalanceSetChoices = config.unitBalanceSetChoices;
-        this.mapChoices = config.mapChoices;        
-
+        this.mapChoices = config.mapChoices;
+        
         let dialogChoiceTrigger = new Trigger();
-
+        
         // Setup regions
         for (let k of Object.keys(config.teamDamageRegion)) {
             let teamId = Number(k);
@@ -72,23 +77,36 @@ export class GameStateManager {
             }
             this.teamDamageRegions[teamId] = region;
         }
-
+        
         for (let b of config.playingBoard) {
             this.playingBoard.push(Rectangle.fromHandle(b));
         }
         
         new Timer().start(1, false, () => {
-
+            
             Log.Info("Entering Game State: BalanceDialog");
             this.gameState = 'balanceDialog';
             
             this.ExecuteGameState();
             // Timer.fromExpired().destroy();
         });
-
+        
         this.heroManager.OnPlayerSelected(() => {
             if (this.gameState == 'heroSelection') this.ExecuteGameState();
         });
+
+        this.expPeriodicTrigger = new Trigger();
+        this.expPeriodicTrigger.registerTimerEvent(2.5, true);
+        this.expPeriodicTrigger.addAction(() => {
+            let exp = math.floor(this.expGainPerGameTick + 0.5);
+            this.heroManager.GetPlayerHero
+            for (let p of this.players) {
+                let pHero = this.heroManager.GetPlayerHero(p);
+                if (pHero) pHero.addExperience(exp, true);
+            }
+            this.expGainPerGameTick *= 1.01;
+        })
+        this.expPeriodicTrigger.enabled = false;
     }
 
     private SetEnabledFogModifierForPlayer(choiceMapId: string | null, p: MapPlayer, enabled: boolean) {
@@ -386,6 +404,9 @@ export class GameStateManager {
             hs.kill();
         }
 
+        // Raise game state event
+        this.gameStateEvent.Raise(GameStateEventType.AllHeroesSelected);
+
         new Timer().start(1, true, () => {
 
             countdown--;
@@ -416,6 +437,13 @@ export class GameStateManager {
                     hero.life = hero.maxLife;
                     hero.mana = 0;
                 }
+
+                // Start exp timer
+                this.expGainPerGameTick = 20;
+                this.expPeriodicTrigger.enabled = true;
+
+                // Raise game state event
+                this.gameStateEvent.Raise(GameStateEventType.RoundStarted);
             }
         });
     }
@@ -444,6 +472,10 @@ export class GameStateManager {
             // Check for victory condition
             if (totalHp == 0) {
                 Log.Message("Team " + team.id + " was victorious.");
+                
+                // Raise game state event
+                this.gameStateEvent.Raise(GameStateEventType.VictoryCondition);
+                
                 this.gameState = 'roundEnd';
                 this.ExecuteGameState();
             }
@@ -451,6 +483,8 @@ export class GameStateManager {
     }
 
     ExecuteRoundEnd(): void {
+        
+        this.expPeriodicTrigger.enabled = false;
         new Timer().start(5.0, false, () => {
             Timer.fromExpired().destroy();
 
@@ -472,6 +506,9 @@ export class GameStateManager {
             for (let u of unitsInPlayArea) {
                 u.destroy();
             }
+
+            // Raise game state event
+            this.gameStateEvent.Raise(GameStateEventType.RoundEnded);
 
             this.gameState = 'balanceDialog';
             this.ExecuteGameState();

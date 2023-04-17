@@ -34,6 +34,7 @@ import { GameBalanceId, UnitBalanceId } from "content/constants/BalanceIds";
 import { PaladinMasteryAbilityData } from "content/spells/paladin/PaladinMastery";
 import { GuardianAngelAbilityData } from "content/spells/paladin/GuardianAngel";
 import { ExorcismAbilityData } from "content/spells/paladin/Exorcism";
+import { WhitePowerAbilityData } from "content/spells/paladin/WhitePower";
 
 const iconPath = "ReplaceableTextures/CommandButtons";
 
@@ -83,7 +84,7 @@ export class Config {
                 tooltip: "White Orb",
             },
             [OrbType.Summoning]: {
-                iconEnabled: iconPath + "/BTNSummoningBall.blp",
+                iconEnabled: iconPath + "/BTNSummoningBall2.blp",
                 iconDisabled: iconPath + "Disabled/DISBTNSummoningBall.blp",
                 tooltip: "Summoning Orb",
             }
@@ -1146,6 +1147,14 @@ export class Config {
             9: 'hR08',
             10: 'hR09',
         }
+    }
+
+    whitePower: WhitePowerAbilityData = {
+        abilityCode: "A00T",
+        orderId: OrderId.Whirlwind,
+        orbCost: [],
+        name: "White Power",
+        whitePowerStackItemCodeId: "I00F",
     }
 
     paladinMastery: PaladinMasteryAbilityData = {

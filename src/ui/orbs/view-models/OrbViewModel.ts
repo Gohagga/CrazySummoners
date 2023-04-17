@@ -1,4 +1,4 @@
-import { MapPlayer } from "w3ts";
+import { Color, MapPlayer, color } from "w3ts";
 import { IOrbModel } from "../interfaces/IOrbModel";
 import { IOrbView } from "../interfaces/IOrbsView";
 import { IOrbViewModel } from "../interfaces/IOrbViewModel";

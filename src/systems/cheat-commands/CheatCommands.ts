@@ -83,6 +83,18 @@ export class CheatCommands {
             this.minionSummoningService.Summon(selected, selected, commands);
         });
 
+        this.createChatPlayerCommand("-camteam", true).addAction(() => {
+            let player = MapPlayer.fromEvent();
+            let team = this.teamManager.GetPlayerTeam(player);
+            let camera = [gg_cam_GameCamera_Red, gg_cam_GameCamera_Blue][team.id];
+            CameraSetupApplyForPlayer(true, camera, player.handle, 0.05);
+        });
+
+        this.createChatPlayerCommand("-cam", true).addAction(() => {
+            let player = MapPlayer.fromEvent();
+            CameraSetupApplyForPlayer(true, gg_cam_GameCameraH1, player.handle, 0.05);
+        });
+
         // this.createChatPlayerCommand("-ai", true, 0).addAction(() => {
         //     let selected = this.selectionService.GetPlayerSelectedUnitIds(red);
         //     for (let u of selected) {

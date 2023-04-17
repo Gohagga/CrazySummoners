@@ -50,6 +50,8 @@ import { BattlegroundService } from "systems/battleground-service/BattlegroundSe
 import { GameEffectsService } from "systems/game-effects/GameEffectsService";
 import { GuardianAngel } from "content/spells/paladin/GuardianAngel";
 import { Exorcism } from "content/spells/paladin/Exorcism";
+import { WhitePower } from "content/spells/paladin/WhitePower";
+import { GameStateEventHandler } from "systems/game-state/GameStateEventHandler";
 
 export function initializeGame() {
 
@@ -112,6 +114,7 @@ export function initializeGame() {
     const unitTypeService = new UnitTypeService(config.unitTypeService, classificationService);
 
     const abilityEvent = new AbilityEventHandler();
+    const gameStateEvent = new GameStateEventHandler();
     const abilityEventProvider = new AbilityEventProvider(abilityEvent, interruptableService);
     const resourceBarManager = new ResourceBarManager(orbFactory, config.resourceBarManager);
     const teamManager = new TeamManager(players, teams);
@@ -138,6 +141,7 @@ export function initializeGame() {
         
         summonMelee: new SummonMelee(config.summonMelee, abilityEvent, minionSummoningService, resourceBarManager),
         summonRanged: new SummonRanged(config.summonRanged, abilityEvent, minionSummoningService, resourceBarManager),
+        whitePower: new WhitePower(config.whitePower, abilityEvent, resourceBarManager),
     }
 
     let paladinMastery = new PaladinMastery(config.paladinMastery, abilityEvent, {
@@ -151,34 +155,39 @@ export function initializeGame() {
     const arcaneTomeShop = new ArcaneTomeShop(config.arcaneTomeShop, resourceBarManager);
 
     const heroManager = new HeroManager<HeroClass>(config.heroManagerConfig, {
-        [HeroClass.Paladin]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager, paladinMastery),
-        [HeroClass.Warlock]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager, paladinMastery),
-        [HeroClass.Elementalist]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager, paladinMastery),
-        [HeroClass.Inquisitor]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager, paladinMastery),
-        [HeroClass.DeathKnight]: u => new PaladinProgression(u, abl, resourceBarManager, skillManager, paladinMastery),
+        [HeroClass.Paladin]: u => new PaladinProgression(u, gameStateEvent, abl, resourceBarManager, skillManager, paladinMastery),
+        [HeroClass.Warlock]: u => new PaladinProgression(u, gameStateEvent, abl, resourceBarManager, skillManager, paladinMastery),
+        [HeroClass.Elementalist]: u => new PaladinProgression(u, gameStateEvent, abl, resourceBarManager, skillManager, paladinMastery),
+        [HeroClass.Inquisitor]: u => new PaladinProgression(u, gameStateEvent, abl, resourceBarManager, skillManager, paladinMastery),
+        [HeroClass.DeathKnight]: u => new PaladinProgression(u, gameStateEvent, abl, resourceBarManager, skillManager, paladinMastery),
     });
     
-    const gameStateManager = new GameStateManager(config.gameStateManager, heroManager, minionFactory, teamManager, resourceBarManager, voteDialogService, enumService, battlegroundService);
+    const gameStateManager = new GameStateManager(config.gameStateManager, heroManager, minionFactory, teamManager, resourceBarManager, voteDialogService, enumService, battlegroundService, players, gameStateEvent);
     
     // UI
     let orbsView = GenerateOrbView(config.orbView, Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0));
+    let orbVm: OrbViewModel[] = [];
+    for (let orbView of orbsView.orbs) {
+        orbVm.push(new OrbViewModel(config.orbViewModelConfig, MapPlayer.fromIndex(0), orbView));
+    }
     
-    // Test
+    let rbVm = new ResourceBarViewModel(MapPlayer.fromIndex(0), orbsView, i =>
+        new OrbViewModel(config.orbViewModelConfig, MapPlayer.fromIndex(0), orbsView.orbs[i]));
+
+    resourceBarManager.OnCreate((owner, bar) => {
+        rbVm.resourceBar = bar;
+    });
+
+
+    // Testing
     {
         const cheatCommands = new CheatCommands(enumService, players, teamManager, heroManager, minionSummoningService);
         cheatCommands.init();
 
-        let orbVm: OrbViewModel[] = [];
-        for (let orbView of orbsView.orbs) {
-            orbVm.push(new OrbViewModel(config.orbViewModelConfig, MapPlayer.fromIndex(0), orbView));
+        heroManager.afterHeroSelectedHook = (hero: Unit) => {
+            // Test
+            // hero.setHeroLevel(20, true);
         }
-        
-        let rbVm = new ResourceBarViewModel(MapPlayer.fromIndex(0), orbsView, i =>
-            new OrbViewModel(config.orbViewModelConfig, MapPlayer.fromIndex(0), orbsView.orbs[i]));
-    
-        resourceBarManager.OnCreate((owner, bar) => {
-            rbVm.resourceBar = bar;
-        });
 
         MapPlayer.fromIndex(0).setState(PLAYER_STATE_RESOURCE_LUMBER, 20);
         // let redResourceBar = rbVm.resourceBar = resourceBarManager.Get(0);
