@@ -91,7 +91,6 @@ export class Bless extends OrbAbility {
         let castSfx = new Effect(this.castSfx, caster, 'origin');
 
         this.spellcastingService.CastSpell(caster, this.id, data.castTime, cb => {
-            cb.Finish();
             castSfx.destroy();
 
             if (false == this.resourceBarManager.Get(ownerId).Consume(this.orbCost)) return;

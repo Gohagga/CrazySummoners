@@ -1,7 +1,8 @@
 import { Zones } from "content/constants/Zones";
 import { Coords } from "systems/coords/Coords";
 import { MapChoice } from "systems/game-state/GameStateManager";
-import { Rectangle, Region, Unit } from "w3ts";
+import { TeamManager } from "systems/team-manager/TeamManager";
+import { MapPlayer, Rectangle, Region, Unit } from "w3ts";
 
 export class BattlegroundService {
     
@@ -12,6 +13,7 @@ export class BattlegroundService {
 
     constructor(
         private readonly mapChoices: Record<string, MapChoice>,
+        private readonly teamManager: TeamManager
     ) {
         
     }
@@ -29,9 +31,9 @@ export class BattlegroundService {
             [Zones.Battleground]: new Region(),
         };
         
-        for (let zoneIdCode of Object.keys(this.mapChoice.laneZones)) {
+        for (let zoneIdCode of Object.keys(this.mapChoice.zoneRegions)) {
             let zoneId = <Zones>Number(zoneIdCode);
-            let zone = this.mapChoice.laneZones[zoneId];
+            let zone = this.mapChoice.zoneRegions[zoneId];
             
             for (let r of zone.rectangles) {
                 zoneRegion[zoneId].addRect(Rectangle.fromHandle(r));
@@ -45,11 +47,11 @@ export class BattlegroundService {
 
         if (!this.activeMapId || !this.mapChoice || !this.zoneRegion) return null;
 
-        let zoneIds = Object.keys(this.mapChoice.laneZones);
+        let zoneIds = Object.keys(this.mapChoice.zoneRegions);
 
         for (let zoneIdCode of zoneIds) {
             let zoneId = <Zones>Number(zoneIdCode);
-            let zone = this.mapChoice.laneZones[zoneId];
+            let zone = this.mapChoice.zoneRegions[zoneId];
 
             // Check region first
             if (this.zoneRegion[zoneId].containsUnit(unit))
@@ -60,6 +62,18 @@ export class BattlegroundService {
                 if (IsUnitInRangeXY(unit.handle, c.x, c.y, c.z))
                     return zoneId;
             }
+        }
+
+        return null;
+    }
+
+    public GetPlayerZoneCrystal(player: MapPlayer, zone: Zones) : Unit | null {
+        if (!this.mapChoice) throw "map choice has not been set";
+
+        const team = this.teamManager.GetPlayerTeam(player);
+        for (let crystalUnit of this.mapChoice.zoneCrystals[zone]) {
+            if (IsPlayerAlly(GetOwningPlayer(crystalUnit), team.teamOwner.handle))
+                return Unit.fromHandle(crystalUnit);
         }
 
         return null;

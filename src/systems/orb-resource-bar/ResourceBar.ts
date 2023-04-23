@@ -96,6 +96,53 @@ export class ResourceBar implements IResourceBarModel {
         return true;
     }
 
+    public CalculateCooldown(cost: OrbType[] | null = null): number {
+        
+        if (!cost) return 0;
+
+        let cooldown = 0;
+        let usedOrbs: Set<number> = new Set<number>();
+        let orbsToConsume: number[] = [];
+
+        for (let i = 0; i < cost.length; i++) {
+            let costOrbType = cost[i];
+
+            let lowestCooldown: number | null = null;
+            let bestOrbIndex: number = -1;
+
+            for (let j = 0; j < this._orbs.length; j++) {
+                if (usedOrbs.has(j)) continue;
+
+                let itOrb = this._orbs[j];
+                if (itOrb.orbTypeId != costOrbType) continue;
+
+                if (itOrb.isAvailable) {
+                    lowestCooldown = 0;
+                    bestOrbIndex = j;
+                    break;
+                    
+                } else if (lowestCooldown == null || itOrb.cooldownRemaining < lowestCooldown) {
+                    lowestCooldown = itOrb.cooldownRemaining;
+                    bestOrbIndex = j;
+                }
+            }
+
+            if (bestOrbIndex > -1) {
+                usedOrbs.add(bestOrbIndex);
+                orbsToConsume.push(bestOrbIndex);
+
+                if (lowestCooldown != null && lowestCooldown > cooldown) {
+                    cooldown = lowestCooldown;
+                }
+            } else {
+                // If the resource bar doesn't even have all the orbs
+                return -1;
+            }
+        }
+        
+        return cooldown;
+    }
+
     public ResetCooldowns(cooldown: number): void {
         for (let orb of this._orbs) {
             if (!orb) continue;

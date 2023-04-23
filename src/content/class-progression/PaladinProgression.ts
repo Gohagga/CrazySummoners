@@ -1,6 +1,17 @@
 import { OrbType } from "content/constants/OrbType";
 import { Bless } from "content/spells/paladin/Bless";
+import { Endure } from "content/spells/paladin/Endure";
+import { Exorcism } from "content/spells/paladin/Exorcism";
+import { GuardianAngel } from "content/spells/paladin/GuardianAngel";
+import { Invigorate } from "content/spells/paladin/Invigorate";
+import { Justice } from "content/spells/paladin/Justice";
 import { PaladinMastery } from "content/spells/paladin/PaladinMastery";
+import { Perseverance } from "content/spells/paladin/Perseverance";
+import { Purge } from "content/spells/paladin/Purge";
+import { Redemption } from "content/spells/paladin/Redemption";
+import { Rejuvenate } from "content/spells/paladin/Rejuvenate";
+import { SummonMelee } from "content/spells/paladin/SummonMelee";
+import { SummonRanged } from "content/spells/paladin/SummonRanged";
 import { WhitePower } from "content/spells/paladin/WhitePower";
 import { IGameStateEventHandler } from "systems/game-state/IGameStateEventHandler";
 import { Delay } from "systems/helpers/Delay";
@@ -11,8 +22,20 @@ import { ISkillManager } from "systems/skill-manager/ISkillManager";
 import { MapPlayer, Unit } from "w3ts";
 
 export type PaladinAbilities = {
+    rejuvenate: Rejuvenate,
     bless: Bless,
+    purge: Purge,
+    invigorate: Invigorate,
+    endure: Endure,
+    justice: Justice,
+    redemption: Redemption,
+    guardianAngel: GuardianAngel,
+    exorcism: Exorcism,
+    
+    summonMelee: SummonMelee,
+    summonRanged: SummonRanged,
     whitePower: WhitePower,
+    perseverance: Perseverance,
 }
 
 export class PaladinProgression extends UnitProgress {

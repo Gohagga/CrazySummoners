@@ -338,9 +338,9 @@ export class GameStateManager {
         });
 
         // Setting up lanes
-        for (let laneId of Object.keys(this.choiceMap.laneZones)) {
+        for (let laneId of Object.keys(this.choiceMap.zoneRegions)) {
             let zoneId = <Zones>Number(laneId);
-            let lane = this.choiceMap.laneZones[zoneId];
+            let lane = this.choiceMap.zoneRegions[zoneId];
             let rects: Rectangle[] = [];
             for (let r of lane.rectangles) {
                 rects.push(Rectangle.fromHandle(r));
@@ -523,8 +523,9 @@ export type MapChoice = {
     teamCamera: Record<number, CameraSetup>,
     visibility: rect[],
     playArea: rect,
-    laneZones: Record<Zones, {
+    zoneRegions: Record<Zones, {
         rectangles: rect[],
         circles: Coords[]
     }>
+    zoneCrystals: Record<Zones, unit[]>
 }

@@ -16,7 +16,7 @@ export abstract class OrbAbility extends AbilityBase {
     private readonly textRenderer: TextRenderer;
 
     protected readonly tooltipCost: string;
-    protected readonly orbCost: OrbType[];
+    public readonly orbCost: OrbType[];
 
     constructor(data: OrbAbilityData) {
         super(data);

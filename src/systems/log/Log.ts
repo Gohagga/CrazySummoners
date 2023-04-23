@@ -9,9 +9,9 @@ export const enum Level {
 }
 
 export const enum LogColor {
-    Info        = '|cfffafaf0',
-    Error       = '|cfff05050'
-
+    Info        = '|cffffdc78',
+    Error       = '|cfff05050',
+    Debug       = '|cff80ff80',
 }
 
 export class Log {
@@ -27,13 +27,17 @@ export class Log {
     public static Info(...msg: any[]) {
         if (Number(this.Level) > Number(Level.Info)) return;
         if (this.ShowOnlyToPlayer && GetLocalPlayer() != this.ShowOnlyToPlayer) return;
-        print(...msg);
+
+        let prefix: string = LogColor.Info;
+        print(prefix, ...msg);
     }
 
     public static Debug(...msg: any[]) {
         if (Number(this.Level) > Number(Level.Debug)) return;
         if (this.ShowOnlyToPlayer && GetLocalPlayer() != this.ShowOnlyToPlayer) return;
-        print(...msg);
+
+        let prefix: string = LogColor.Debug;
+        print(prefix, ...msg);
     }
 
     public static Error<Type extends new (...a: any[]) => any>(msgOrType: Type | string | number, ...msg: (string | number)[]) {

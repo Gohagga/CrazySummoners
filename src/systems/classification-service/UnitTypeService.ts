@@ -20,7 +20,7 @@ export class UnitTypeService {
         }
     }
 
-    private GetUnitType(unitOrTypeId: Unit | number): UnitType {
+    public GetUnitType(unitOrTypeId: Unit | number): UnitType {
         if (typeof(unitOrTypeId) == 'number') return this.classificationService.Get(unitOrTypeId) || UnitType.Untyped;
         return this.classificationService.Get(unitOrTypeId.typeId) || UnitType.Untyped;
     }

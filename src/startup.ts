@@ -52,11 +52,13 @@ import { GuardianAngel } from "content/spells/paladin/GuardianAngel";
 import { Exorcism } from "content/spells/paladin/Exorcism";
 import { WhitePower } from "content/spells/paladin/WhitePower";
 import { GameStateEventHandler } from "systems/game-state/GameStateEventHandler";
+import { Perseverance } from "content/spells/paladin/Perseverance";
+import { PaladinAiController } from "content/ai-controllers/PaladinAiController";
 
 export function initializeGame() {
 
     let config = new Config();
-    Log.Level = Level.Error;
+    Log.Level = Level.Debug;
     Log.ShowOnlyToPlayer = Player(0);
 
     const players: MapPlayer[] = [
@@ -120,12 +122,12 @@ export function initializeGame() {
     const teamManager = new TeamManager(players, teams);
     const skillManager = new SkillManager();
     const dummyUnitManager = new DummyUnitManager(config.dummyUnitManager);
-    const battlegroundService = new BattlegroundService(config.gameStateManager.mapChoices);
+    const battlegroundService = new BattlegroundService(config.gameStateManager.mapChoices, teamManager);
 
     const minionSummoningService = new MinionSummoningService(config.minionSummoning, minionFactory, enumService, teamManager, new MinionAiManager());
     const spellcastingService = new SpellcastingService(config.spellcastingService, interruptableService);
     const dummyAbilityFactory = new DummyAbilityFactory(dummyUnitManager);
-    const gammeEffectsService = new GameEffectsService(minionSummoningService);
+    const gameEffectsService = new GameEffectsService(minionSummoningService);
 
     //#region Spells
     const abl = {
@@ -135,13 +137,14 @@ export function initializeGame() {
         invigorate: new Invigorate(config.invigorate, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory, unitTypeService),
         endure: new Endure(config.endure, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory),
         justice: new Justice(config.justice, abilityEvent, resourceBarManager, spellcastingService),
-        redemption: new Redemption(config.redemption, abilityEvent, resourceBarManager, spellcastingService, enumService, battlegroundService, gammeEffectsService),
-        guardianAngel: new GuardianAngel(config.guardianAngel, abilityEvent, resourceBarManager, spellcastingService, enumService, battlegroundService, gammeEffectsService, dummyUnitManager),
+        redemption: new Redemption(config.redemption, abilityEvent, resourceBarManager, spellcastingService, enumService, battlegroundService, gameEffectsService),
+        guardianAngel: new GuardianAngel(config.guardianAngel, abilityEvent, resourceBarManager, spellcastingService, enumService, battlegroundService, gameEffectsService, dummyUnitManager),
         exorcism: new Exorcism(config.exorcism, abilityEvent, resourceBarManager, spellcastingService, enumService, unitTypeService),
         
         summonMelee: new SummonMelee(config.summonMelee, abilityEvent, minionSummoningService, resourceBarManager),
         summonRanged: new SummonRanged(config.summonRanged, abilityEvent, minionSummoningService, resourceBarManager),
         whitePower: new WhitePower(config.whitePower, abilityEvent, resourceBarManager),
+        perseverance: new Perseverance(config.perseverance, abilityEvent, gameEffectsService, unitTypeService),
     }
 
     let paladinMastery = new PaladinMastery(config.paladinMastery, abilityEvent, {
@@ -178,7 +181,7 @@ export function initializeGame() {
         rbVm.resourceBar = bar;
     });
 
-
+    
     // Testing
     {
         const cheatCommands = new CheatCommands(enumService, players, teamManager, heroManager, minionSummoningService);
@@ -187,6 +190,11 @@ export function initializeGame() {
         heroManager.afterHeroSelectedHook = (hero: Unit) => {
             // Test
             // hero.setHeroLevel(20, true);
+            const ai = new PaladinAiController(hero.owner, hero, abl, battlegroundService, enumService, minionFactory, unitTypeService, resourceBarManager, abilityEvent, gameStateEvent);
+            new Timer().start(1, true, () => {
+                if (hero.isAlive() == false) Timer.fromExpired().destroy();
+                ai.update();
+            });
         }
 
         MapPlayer.fromIndex(0).setState(PLAYER_STATE_RESOURCE_LUMBER, 20);

@@ -35,6 +35,7 @@ import { PaladinMasteryAbilityData } from "content/spells/paladin/PaladinMastery
 import { GuardianAngelAbilityData } from "content/spells/paladin/GuardianAngel";
 import { ExorcismAbilityData } from "content/spells/paladin/Exorcism";
 import { WhitePowerAbilityData } from "content/spells/paladin/WhitePower";
+import { PerseveranceAbilityData } from "content/spells/paladin/Perseverance";
 
 const iconPath = "ReplaceableTextures/CommandButtons";
 
@@ -109,7 +110,7 @@ export class Config {
                 teamCamera: { 0: CameraSetup.fromHandle(gg_cam_GameCameraH1), 1: CameraSetup.fromHandle(gg_cam_GameCameraH2) },
                 visibility: [gg_rct_PlayArea],
                 playArea: gg_rct_Battleground,
-                laneZones: { 
+                zoneRegions: { 
                     [Zones.Lane1]: { rectangles: [gg_rct_Lane_1], circles: [] },
                     [Zones.Lane2]: { rectangles: [gg_rct_Lane_2], circles: [] },
                     [Zones.Lane3]: { rectangles: [gg_rct_Lane_3], circles: [] },
@@ -117,6 +118,14 @@ export class Config {
                     [Zones.Lane5]: { rectangles: [gg_rct_Lane_5], circles: [] },
                     [Zones.Battleground]: { rectangles: [gg_rct_Battleground], circles: [] },
                 },
+                zoneCrystals: {
+                    [Zones.Lane1]: [gg_unit_h001_0014, gg_unit_h002_0009],
+                    [Zones.Lane2]: [gg_unit_h001_0008, gg_unit_h002_0010],
+                    [Zones.Lane3]: [gg_unit_h001_0006, gg_unit_h002_0011],
+                    [Zones.Lane4]: [gg_unit_h001_0004, gg_unit_h002_0012],
+                    [Zones.Lane5]: [gg_unit_h001_0015, gg_unit_h002_0013],
+                    [Zones.Battleground]: [],
+                }
             },
             // "map2": {
             //     name: "Map 2",
@@ -308,7 +317,7 @@ export class Config {
                 unit: gg_unit_h002_0010,
                 region: gg_rct_CrystalBlueA4,
                 limit: 8,
-                destination: gg_unit_h002_0010,
+                destination: gg_unit_h001_0008,
             }, {
                 unit: gg_unit_h002_0009,
                 region: gg_rct_CrystalBlueA5,
@@ -1131,7 +1140,7 @@ export class Config {
 
     summonRanged: SummonRangedAbilityData = {
         abilityCode: 'A002',
-        orderId: OrderId.Acidbomb,
+        orderId: OrderId.Acolyteharvest,
         orbCost: [OrbType.Summoning],
         name: 'Summon Ranged',
         tooltip: '',
@@ -1155,6 +1164,14 @@ export class Config {
         orbCost: [],
         name: "White Power",
         whitePowerStackItemCodeId: "I00F",
+    }
+
+    perseverance: PerseveranceAbilityData = {
+        abilityCode: "A014",
+        orderId: OrderId.Preservation,
+        orbCost: [],
+        name: "Perseverance",
+        auraCodeId: "A013",
     }
 
     paladinMastery: PaladinMasteryAbilityData = {

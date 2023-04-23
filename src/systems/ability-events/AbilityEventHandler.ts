@@ -1,18 +1,19 @@
-import { RecordEventHandler } from "../events/generic/RecordEventHandler";
+import { RecordEventBusHandler } from "systems/events/generic/RecordEventBusHandler";
 import { AbilityEventType } from "./AbilityEventType";
+import { IAbilityEventHandler } from "./IAbilityEventHandler";
 import { AbilityEvent } from "./event-models/AbilityEvent";
 import { AbilityFinishEvent } from "./event-models/AbilityFinishEvent";
-import { IAbilityEventHandler } from "./IAbilityEventHandler";
+import { Log } from "systems/log/Log";
 
 export class AbilityEventHandler implements IAbilityEventHandler {
 
-    private readonly handles: Record<AbilityEventType, RecordEventHandler<(e: any) => any>> = {
-        [AbilityEventType.Cast]: new RecordEventHandler<(e: AbilityEvent) => void>(),
-        [AbilityEventType.Effect]: new RecordEventHandler<(e: AbilityEvent) => boolean>(),
-        [AbilityEventType.End]: new RecordEventHandler<(e: AbilityEvent) => void>(),
-        [AbilityEventType.Finished]: new RecordEventHandler<(e: AbilityFinishEvent) => void>(),
-        [AbilityEventType.Success]: new RecordEventHandler<(e: AbilityEvent) => void>(),
-        [AbilityEventType.Order]: new RecordEventHandler<(e: AbilityEvent) => void>(),
+    private readonly handles: Record<AbilityEventType, RecordEventBusHandler<(e: any) => any>> = {
+        [AbilityEventType.Cast]: new RecordEventBusHandler<(e: AbilityEvent) => void>(),
+        [AbilityEventType.Effect]: new RecordEventBusHandler<(e: AbilityEvent) => boolean>(),
+        [AbilityEventType.End]: new RecordEventBusHandler<(e: AbilityEvent) => void>(),
+        [AbilityEventType.Finished]: new RecordEventBusHandler<(e: AbilityFinishEvent) => void>(),
+        [AbilityEventType.Success]: new RecordEventBusHandler<(e: AbilityEvent) => void>(),
+        [AbilityEventType.Order]: new RecordEventBusHandler<(e: AbilityEvent) => void>(),
     }
 
     private Subscribe(type: AbilityEventType, abilityId: number, callback: (e: AbilityEvent) => void) {
@@ -45,12 +46,23 @@ export class AbilityEventHandler implements IAbilityEventHandler {
         else event = new AbilityEvent();
 
         if (abilityId in this.handles[type].Subscriptions) {
-            let result = this.handles[type].Subscriptions[abilityId](event);
+            let subs = this.handles[type].Subscriptions[abilityId];
 
-            if (type == AbilityEventType.Effect &&
-                result === true &&
-                abilityId in this.handles[AbilityEventType.Success].Subscriptions)
-                this.handles[AbilityEventType.Success].Subscriptions[abilityId](event);
+            let result = true;
+            for (let sub of subs) {
+                result &&= sub(event);
+            }
+
+            Log.Debug("AbilityEvent", type, "result", result);
+            
+            if (type == AbilityEventType.Effect && result === true && abilityId in subs) {
+
+                const successSubs = this.handles[AbilityEventType.Success].Subscriptions[abilityId];
+                for (let successSub of successSubs) {
+                    Log.Debug("AbilityEvent Finished Sub", type, "result", result);
+                    successSub(event);
+                }
+            }
         }
     }
 }
