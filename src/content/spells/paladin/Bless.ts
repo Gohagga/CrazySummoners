@@ -26,7 +26,8 @@ export interface BlessAbilityData extends OrbAbilityData {
     castSfx: string,
     dummyBless: {
         spellCodeId: string,
-        orderId: number
+        orderId: number,
+        buffCodeId: string,
     }
 }
 
@@ -57,6 +58,7 @@ export class Bless extends OrbAbility {
     
     private readonly castSfx: string;
     private readonly blessEffect: ITargetEffect<{ bonus: number }>
+    public readonly dummyBlessBuffId: number;
 
     constructor(
         data: BlessAbilityData,
@@ -69,6 +71,7 @@ export class Bless extends OrbAbility {
         super(data);
 
         this.castSfx = data.castSfx;
+        this.dummyBlessBuffId = FourCC(data.dummyBless.buffCodeId);
         
         let dummyBlessId = FourCC(data.dummyBless.spellCodeId);
         this.blessEffect = dummyAbilityFactory.CreateTargetEffect<{ bonus: number }>(dummyBlessId, data.dummyBless.orderId, (prop, a, lvl) => {
@@ -118,7 +121,7 @@ export class Bless extends OrbAbility {
         return true;
     }
     
-    public GetUnitConfig = (unit: Unit) => this.unitConfigurable.GetUnitConfig(unit).level[unit.getAbilityLevel(this.id)];
+    public GetUnitConfig = (unit: Unit, lvl?: number) => this.unitConfigurable.GetUnitConfig(unit).level[lvl || unit.getAbilityLevel(this.id)];
     UpdateUnitSkill(unit: Unit): void {
 
         let data = this.GetUnitConfig(unit);

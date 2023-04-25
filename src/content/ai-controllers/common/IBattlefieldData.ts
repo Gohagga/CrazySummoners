@@ -1,5 +1,6 @@
 import { UnitType } from "content/constants/UnitType";
 import { Zones } from "content/constants/Zones";
+import { Unit } from "w3ts";
 
 export interface IBattlefieldDataController {
     getBattlefieldData(): BattlefieldData;
@@ -24,6 +25,7 @@ export type BattlefieldData = {
 }
 
 export type BattlefieldUnit = {
+    unit: Unit;
     hpPercent: number;
     lvl: number;
     unitType: UnitType;

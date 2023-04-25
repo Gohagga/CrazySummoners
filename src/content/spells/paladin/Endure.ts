@@ -128,7 +128,7 @@ export class Endure extends OrbAbility {
         return true;
     }
     
-    public GetUnitConfig = (unit: Unit) => this.unitConfigurable.GetUnitConfig(unit).level[unit.getAbilityLevel(this.id)];
+    public GetUnitConfig = (unit: Unit, lvl?: number) => this.unitConfigurable.GetUnitConfig(unit).level[lvl || unit.getAbilityLevel(this.id)];
     UpdateUnitSkill(unit: Unit): void {
 
         let data = this.GetUnitConfig(unit);

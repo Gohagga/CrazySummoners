@@ -6,7 +6,7 @@ import { BattlegroundService } from "systems/battleground-service/BattlegroundSe
 import { PlayerController } from "systems/player-ai/PlayerController";
 import { StateTransitionBuilder } from "systems/player-ai/StateTransitionBuilder";
 import { MapPlayer, Timer, Unit } from "w3ts";
-import { ICastSpellContext, ICastSpellController } from "./common/CastSpell";
+import { CastSpellState, ICastSpellContext, ICastSpellController } from "./common/CastSpell";
 import { ISummonUnitContext, ISummonUnitController, SummonUnitState } from "./common/SummonUnit";
 import { IMonitorBattlefieldContext, IMonitorBattlefieldController } from "./paladin/MonitorBattlefield";
 import { Log } from "systems/log/Log";
@@ -22,13 +22,30 @@ import { OrbAbility } from "systems/abilities/OrbAbility";
 import { IdleState } from "systems/player-ai/IdleState";
 import { BattlefieldData, BattlefieldLane, BattlefieldUnit } from "./common/IBattlefieldData";
 import { DefensiveBattleTacticContext as IDefensiveBattleTacticContext, DefensiveBattleTacticState, DefensiveBattleTacticController as IDefensiveBattleTacticController } from "./paladin/DefensiveBattleTacticState";
+import { IAiStats } from "./common/IAiStats";
+import { OrderId } from "w3ts/globals/order";
 
 interface IPaladinAiContext extends
     IMonitorBattlefieldContext,
     ISummonUnitContext,
     ICastSpellContext,
     INeutralizeLaneTacticContext,
-    IDefensiveBattleTacticContext {};
+    IDefensiveBattleTacticContext,
+    IAiStats {};
+
+export const enum PaladinAction {
+    summonMelee = 'summonMelee',
+    summonRanged = 'summonRanged',
+    rejuvenate = 'rejuvenate',
+    bless = 'bless',
+    purge = 'purge',
+    invigorate = 'invigorate',
+    endure = 'endure',
+    justice = 'justice',
+    redemption = 'redemption',
+    guardianAngel = 'guardianAngel',
+    exorcism = 'exorcism',
+}
 
 export class PaladinAiController extends PlayerController implements
     IMonitorBattlefieldController,
@@ -63,15 +80,12 @@ export class PaladinAiController extends PlayerController implements
         // Level 1 - SummonMelee, SummonRanged, NeutralizeLaneTacticIdle
         const summonMelee = new SummonUnitState(this.context, this, 'summonMelee', 'summonMeleeState');
         const summonRanged = new SummonUnitState(this.context, this, 'summonRanged', 'summonRangedState');
+        const castRejuvenate = new CastSpellState(this.context, this, PaladinAction.rejuvenate, 'rejuvenateState');
+        const castBless = new CastSpellState(this.context, this, PaladinAction.bless, 'blessState');
         const neutralizeLaneTacticIdle = new IdleState(this.context, this);
 
         // FSM - Set child states and initial state
-        neutralizeLaneTactic.addChildState(neutralizeLaneTacticIdle);
-        neutralizeLaneTactic.addChildState(summonMelee);
-        neutralizeLaneTactic.addChildState(summonRanged);
         neutralizeLaneTactic.setInitialState(neutralizeLaneTacticIdle);
-        defensiveBattleTactic.addChildState(defensiveBattleTacticIdle);
-        defensiveBattleTactic.addChildState(neutralizeLaneTactic);
         defensiveBattleTactic.setInitialState(defensiveBattleTacticIdle);
 
         // FSM - State transitions
@@ -89,17 +103,35 @@ export class PaladinAiController extends PlayerController implements
 
         this.transitionFrom<INeutralizeLaneTacticContext>(neutralizeLaneTacticIdle)
             .to(summonMelee).when(c => c.outputLane == 'summonMelee')
-            .to(summonRanged).when(c => c.outputLane == 'summonRanged');
+            .to(summonRanged).when(c => c.outputLane == 'summonRanged')
+            .to(castRejuvenate).when(c => c.outputLane == PaladinAction.rejuvenate)
+            .to(castBless).when(c => c.outputLane == PaladinAction.bless);
 
         this.transitionFrom<any>(summonMelee)
             .to(neutralizeLaneTacticIdle).when(c => this.context.isSummonUnitDone)
             .to(summonRanged).when(c => this.context.outputLane == 'summonRanged')
-            .to(summonMelee).when(c => this.context.outputLane == 'summonMelee');
+            .to(summonMelee).when(c => this.context.outputLane == 'summonMelee')
+            .to(castRejuvenate).when(c => c.outputLane == PaladinAction.rejuvenate)
+            .to(castBless).when(c => c.outputLane == PaladinAction.bless);
 
         this.transitionFrom<any>(summonRanged)
             .to(neutralizeLaneTacticIdle).when(c => this.context.isSummonUnitDone)
             .to(summonMelee).when(c => this.context.outputLane == 'summonMelee')
-            .to(summonRanged).when(c => this.context.outputLane == 'summonRanged');
+            .to(summonRanged).when(c => this.context.outputLane == 'summonRanged')
+            .to(castRejuvenate).when(c => c.outputLane == PaladinAction.rejuvenate)
+            .to(castBless).when(c => c.outputLane == PaladinAction.bless);
+
+        this.transitionFrom<any>(castRejuvenate)
+            .to(neutralizeLaneTacticIdle).when(c => { print("CHECKING REJUV", this.context.isCastSpellDone); return this.context.isCastSpellDone; })
+            .to(summonMelee).when(c => this.context.outputLane == 'summonMelee')
+            .to(summonRanged).when(c => this.context.outputLane == 'summonRanged')
+            .to(castBless).when(c => c.outputLane == PaladinAction.bless);
+
+        this.transitionFrom<any>(castBless)
+            .to(neutralizeLaneTacticIdle).when(c => this.context.isCastSpellDone)
+            .to(summonMelee).when(c => this.context.outputLane == 'summonMelee')
+            .to(summonRanged).when(c => this.context.outputLane == 'summonRanged')
+            .to(castRejuvenate).when(c => c.outputLane == PaladinAction.rejuvenate);
 
         this.transitionFrom<INeutralizeLaneTacticContext>(neutralizeLaneTactic)
             .to(defensiveBattleTacticIdle).when(c => c.outputLane == 'continue');
@@ -107,27 +139,52 @@ export class PaladinAiController extends PlayerController implements
         this.context.targetLane = 3;
 
         // Set initial state when the round starts
-        gameStateEvent.Subscribe(GameStateEventType.RoundStarted, () => new Timer().start(1, false, () => this.changeState(idle)));
+        gameStateEvent.Subscribe(GameStateEventType.RoundStarted, () => new Timer().start(1, false, () => 
+        {
+            this.changeState(idle);
+        }));
+
+        this.hero.removeAbility(FourCC('A03H'));
 
         // Set up ability event listeners for command fulfillment tracking
         for (let key of Object.keys(abilities)) {
             let ab = (<Record<string, AbilityBase>>abilities)[key];
-            abilityEvent.OnAbilityEffect(ab.id, e => {
-                if (e.caster != this.hero) return true;
 
-                for (let commandId of Object.keys(this._commandOrderIds)) {
-                    if (this._commandOrderIds[Number(commandId)] == ab.orderId) {
-                        Log.Debug("Command fulfilled", commandId);
-                        delete this._commandOrderIds[Number(commandId)];
-                        // Call update immediately
-                        new Timer().start(0, false, () => {
-                            Timer.fromExpired().destroy();
-                            this.update();
-                        });
+            if (key == PaladinAction.rejuvenate || key == PaladinAction.exorcism) {
+                abilityEvent.OnAbilityEnd(ab.id, e => {
+                    if (e.caster != this.hero) return true;
+    
+                    for (let commandId of Object.keys(this._commandOrderIds)) {
+                        if (this._commandOrderIds[Number(commandId)] == ab.orderId) {
+                            Log.Debug("Command fulfilled", commandId);
+                            delete this._commandOrderIds[Number(commandId)];
+                            // Call update immediately
+                            new Timer().start(0, false, () => {
+                                Timer.fromExpired().destroy();
+                                this.update();
+                            });
+                        }
                     }
-                }
-                return true;
-            });
+                    return true;
+                });
+            } else {
+                abilityEvent.OnAbilityEffect(ab.id, e => {
+                    if (e.caster != this.hero) return true;
+    
+                    for (let commandId of Object.keys(this._commandOrderIds)) {
+                        if (this._commandOrderIds[Number(commandId)] == ab.orderId) {
+                            Log.Debug("Command fulfilled", commandId);
+                            delete this._commandOrderIds[Number(commandId)];
+                            // Call update immediately
+                            new Timer().start(0, false, () => {
+                                Timer.fromExpired().destroy();
+                                this.update();
+                            });
+                        }
+                    }
+                    return true;
+                });
+            }
         }
     }
     
@@ -140,16 +197,14 @@ export class PaladinAiController extends PlayerController implements
         allyUnitsTotalHp: 0,
         enemyUnitsTotalHp: 0,
         targetLane: 0,
-        spellName: '',
-        position: 0,
         isSummonUnitDone: false,
-        enemyUnitCount: 0,
-        allyUnitCount: 0,
-        enemyTroopPower: 0,
-        allyTroopPower: 0,
-        currentManeuverStep: 0,
-        currentManeuver: 0,
-        outputLane: ""
+        isCastSpellDone: false,
+        outputLane: "",
+        stat: {
+            desperation: 0.5,
+            preservation: 0.5,
+            vengeance: 0.5,
+        },
     };
     //#endregion
 
@@ -158,6 +213,20 @@ export class PaladinAiController extends PlayerController implements
     private _commandOrderIds: Record<number, number> = {};
     private _cachedLaneData: Record<number, BattlefieldLane> = {};
     private _cachedBattlefieldData: BattlefieldData | null = null;
+    private _cachedActionEnabled: Record<string, boolean> = {};
+    private _orbCost: Record<PaladinAction, OrbType[]> = {
+        'summonMelee': (<OrbAbility>this.abilities.summonMelee).orbCost,
+        'summonRanged': (<OrbAbility>this.abilities.summonRanged).orbCost,
+        'rejuvenate': (<OrbAbility>this.abilities.rejuvenate).orbCost,
+        'bless': (<OrbAbility>this.abilities.bless).orbCost,
+        'purge': (<OrbAbility>this.abilities.purge).orbCost,
+        'invigorate': (<OrbAbility>this.abilities.invigorate).orbCost,
+        'endure': (<OrbAbility>this.abilities.endure).orbCost,
+        'justice': (<OrbAbility>this.abilities.justice).orbCost,
+        'redemption': (<OrbAbility>this.abilities.redemption).orbCost,
+        'guardianAngel': (<OrbAbility>this.abilities.guardianAngel).orbCost,
+        'exorcism': (<OrbAbility>this.abilities.exorcism).orbCost,
+    };
     //#endregion
 
     getAllyUnitsByLane(): number {
@@ -203,7 +272,7 @@ export class PaladinAiController extends PlayerController implements
         this._commandOrderIds[commandId] = orderId;
         return commandId;
     }
-    getSummonUnitCommandStatus(id: number): 'notStarted' | 'started' | 'done' {
+    getCommandStatus(id: number): 'notStarted' | 'started' | 'done' {
         // let status: 'notStarted' | 'started' | 'done' = 'done';
 
         if (id == 0) {
@@ -228,8 +297,67 @@ export class PaladinAiController extends PlayerController implements
         Log.Debug("isSummonUnitCommandDone E", id, orderId, 'started', this.hero.currentOrder);
         return 'started';
     }
-    castSpell(spellName: string, position: number): void {
-        throw new Error("Method not implemented.");
+
+    issueCastSpellCommand(action: string, lane: number): number {
+        Log.Debug("issueCastSpellCommand", action, lane);
+
+        // const crystalUnit = this.battlegroundService.GetPlayerZoneCrystal(this.player, lane as Zones);
+        // if (!crystalUnit) throw new Error("AI cannot issue summon command.");
+
+        let orderId = 0;
+        const paladinAction = action as PaladinAction;
+        let result = false;
+        switch (paladinAction) {
+            case PaladinAction.rejuvenate: {
+                Log.Debug("Performing rejuvenate");
+                orderId = this.abilities.rejuvenate.orderId;
+                let mostDamaged: BattlefieldUnit | null = null;
+                let laneData = this.getBattlefieldLane(lane);
+                for (let au of laneData.allyUnits) {
+                    if (!mostDamaged || au.hpPercent < mostDamaged.hpPercent) {
+                        mostDamaged = au;
+                    }
+                }
+                if (!mostDamaged) return 0;
+                Log.Debug("mostDamaged", mostDamaged.hpPercent, orderId);
+
+                let { x, y } = mostDamaged.unit;
+                result = this.hero.issueOrderAt(orderId, x, y);
+                break;
+            };
+            case PaladinAction.bless: {
+                orderId = this.abilities.bless.orderId;
+                // Pick the unit with highest level and then highest hp%
+                let highestLvl: BattlefieldUnit | null = null;
+                let laneData = this.getBattlefieldLane(lane);
+                for (let au of laneData.allyUnits) {
+                    if (au.unit.getAbilityLevel(this.abilities.bless.dummyBlessBuffId)) continue;
+
+                    if (!highestLvl || highestLvl.lvl < au.lvl) {
+                        highestLvl = au;
+                    } else if (highestLvl.lvl == au.lvl && highestLvl.hpPercent < au.hpPercent) {
+                        highestLvl = au;
+                    }
+                }
+                if (!highestLvl) return 0;
+
+                let { x, y } = highestLvl.unit;
+                result = this.hero.issueOrderAt(orderId, x, y);
+                break;
+            };
+            default: {
+            }
+        };
+
+        const commandId = this._commandIdCounter++;
+
+        if (!result) {
+            this._commandOrderIds[commandId] = 0;
+            return 0;
+        }
+
+        this._commandOrderIds[commandId] = orderId;
+        return commandId;
     }
 
     getLaneUnits(lane: number): { isEnemy: boolean; hpPercent: number; lvl: number; unitType: UnitType; isRanged: boolean; }[] {
@@ -266,6 +394,99 @@ export class PaladinAiController extends PlayerController implements
             return this.hero.getAbilityLevel(this.abilities.summonMelee.id);
         } else if (action == 'summonRanged') {
             return this.hero.getAbilityLevel(this.abilities.summonRanged.id);
+        }
+
+        let value = 0;
+
+        if (action == PaladinAction.rejuvenate) {
+            // Pick the unit with lowest hp % and highest level and enum units around it
+            if (!lane) return 0;
+
+            let mostDamaged: BattlefieldUnit | null = null;
+            let laneData = this.getBattlefieldLane(lane);
+            for (let au of laneData.allyUnits) {
+                if (!mostDamaged || au.hpPercent < mostDamaged.hpPercent) {
+                    mostDamaged = au;
+                }
+            }
+
+            if (mostDamaged != null) {
+                let lvl = this.abilities.paladinMastery.GetHeroAbilityLevel(this.hero, this.abilities.rejuvenate.id);
+                Log.Debug("lvl", lvl);
+                const data = this.abilities.rejuvenate.GetUnitConfig(this.hero, lvl);
+                const healPercentPerTick = data.healPercent * data.channelTime / data.healInterval;
+                let unitsAround = this.enumUnitService.EnumUnitsInRange(mostDamaged.unit, data.aoe, target =>
+                    target.isAlly(this.player) && target.isAlive())
+                    .sort((a, b) => (a.life / a.maxLife) - (b.life / b.maxLife));
+                
+                let count = data.targetCount;
+                for (let u of unitsAround) {
+                    if (count-- == 0) break;
+                    let lvl = this.minionFactory.GetMinionLevel(u);
+                    let maxHealed = (1 - GetWidgetLife(u.handle) / u.maxLife);
+                    let unitValue = lvl * healPercentPerTick;
+                    if (unitValue > maxHealed) unitValue = maxHealed;
+                    value += unitValue;
+                }
+            }
+
+            return value;
+        }
+
+        else if (action == PaladinAction.bless) {
+            if (!lane) return 0;
+            // value = 0;
+
+            // Pick the unit with highest level and then highest hp%
+            let highestLvl: BattlefieldUnit | null = null;
+            let laneData = this.getBattlefieldLane(lane);
+            for (let au of laneData.allyUnits) {
+                if (au.unit.getAbilityLevel(this.abilities.bless.dummyBlessBuffId) > 0) continue;
+
+                if (!highestLvl || highestLvl.lvl < au.lvl) {
+                    highestLvl = au;
+                } else if (highestLvl.lvl == au.lvl && highestLvl.hpPercent < au.hpPercent) {
+                    highestLvl = au;
+                }
+            }
+
+            if (highestLvl != null) {
+                let lvl = this.abilities.paladinMastery.GetHeroAbilityLevel(this.hero, this.abilities.bless.id);
+                Log.Debug("lvl", lvl);
+                const data = this.abilities.bless.GetUnitConfig(this.hero);
+                //               0.4                        10s                                         25
+                const hpPcPer100BonusPerCast = data.duration / this.minionFactory.gameBalance.secondsToDie;
+                //               2                      0.4                   5
+                const powerPer100PercentCast = hpPcPer100BonusPerCast * highestLvl.lvl;
+                //         0.2                 2                             0.1
+                const powerPerCast = powerPer100PercentCast * data.damageBonusPercent;
+
+                let unitsAround = this.enumUnitService.EnumUnitsInRange(highestLvl.unit, data.aoe, target =>
+                    target.isAlly(this.player) && target.isAlive());
+                
+                for (let u of unitsAround) {
+                    const hp = GetWidgetLife(u.handle);
+                    const maxHp = u.maxLife;
+                    let hpPercent = (hp / maxHp);
+                    let lvl = this.minionFactory.GetMinionLevel(u);
+
+                    let lifeExpectancyFactor = 1;
+                    if (hp < 0.99 * u.maxLife) {
+                        // If unit is damaged, should assume its buff might not be fully utilized.
+                        let secondsToDie = hpPercent * this.minionFactory.gameBalance.secondsToDie / laneData.powerRatio;
+                        if (secondsToDie < data.duration) {
+                            lifeExpectancyFactor = secondsToDie / data.duration;
+                        }
+                    }
+
+                    // One whole lvl = 25 seconds worth of 100% buff
+                    let durationFactor = data.duration / this.minionFactory.gameBalance.secondsToDie;
+                    let unitValue = lvl * durationFactor * lifeExpectancyFactor * data.damageBonusPercent;
+                    value += unitValue;
+                }
+            }
+            
+            return value;
         }
 
         return 0;
@@ -323,6 +544,7 @@ export class PaladinAiController extends PlayerController implements
             const isRanged = u.isUnitType(UNIT_TYPE_RANGED_ATTACKER)
 
             const unitData: BattlefieldUnit = {
+                unit: u,
                 hpPercent,
                 lvl,
                 unitType,
@@ -345,8 +567,32 @@ export class PaladinAiController extends PlayerController implements
         return laneData;
     }
 
+    
+    isActionEnabled(action: PaladinAction): boolean {
+        if (action in this._cachedActionEnabled) return this._cachedActionEnabled[action];
+
+        let bar = this.resourceBarManager.Get(this.player.id);
+        let orbCost = this._orbCost[action];
+        let enabled = bar.HasOrbs(orbCost);
+
+        this._cachedActionEnabled[action] = enabled;
+        return enabled;
+    }
+    prepareAction(action: string): void {
+        Log.Debug("prepareAction", action);
+        let ab = (<Record<string, AbilityBase>>this.abilities)[action];
+        ab.AddToUnit(this.hero);
+        this.abilities.paladinMastery.UpdateHeroAbilityLevel(this.hero, ab.id);
+    }
+    unprepareAction(action: string): void {
+        Log.Debug("unprepareAction", action);
+        let ab = (<Record<string, AbilityBase>>this.abilities)[action];
+        ab.RemoveFromUnit(this.hero);
+    }
+
     private resetCachedData() {
         this._cachedLaneData = {};
+        this._cachedActionEnabled = {};
         this._cachedBattlefieldData = null;
     }
 

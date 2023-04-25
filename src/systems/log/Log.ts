@@ -29,15 +29,15 @@ export class Log {
         if (this.ShowOnlyToPlayer && GetLocalPlayer() != this.ShowOnlyToPlayer) return;
 
         let prefix: string = LogColor.Info;
-        print(prefix, ...msg);
+        print(prefix, ...msg, '|r');
     }
 
     public static Debug(...msg: any[]) {
         if (Number(this.Level) > Number(Level.Debug)) return;
         if (this.ShowOnlyToPlayer && GetLocalPlayer() != this.ShowOnlyToPlayer) return;
 
-        let prefix: string = LogColor.Debug;
-        print(prefix, ...msg);
+        // let prefix: string = LogColor.Debug;
+        print(...msg);
     }
 
     public static Error<Type extends new (...a: any[]) => any>(msgOrType: Type | string | number, ...msg: (string | number)[]) {
@@ -50,7 +50,7 @@ export class Log {
         
         // print("Type of first is ...", first.name, typeof(first));
         msg.push("|r");
-        print(prefix, ...msg);
+        print(prefix, ...msg, '|r');
     }
 
     private static step = 0;

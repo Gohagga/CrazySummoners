@@ -3,7 +3,6 @@ import { Transition } from "./Transition";
 import { IState, State, UpdateResult } from "./State";
 
 export abstract class ParentState<TContext, TController> extends State<TContext, TController> {
-    protected childStates: IState[] = [];
     protected currentState: IState | null = null;
 
     constructor(name: string, context: TContext, controller: TController) {
@@ -25,8 +24,10 @@ export abstract class ParentState<TContext, TController> extends State<TContext,
             const childUpdateResult = this.currentState.update();
 
             // Check for transitions in the child state and handle them if the result is ContinueProcessing
-            if (childUpdateResult == UpdateResult.ContinueProcessing) {
+            if (childUpdateResult == UpdateResult.ContinueProcessing
+                || childUpdateResult == UpdateResult.RunImmediateUpdate) {
                 const childNextState = this.currentState.getNextState();
+                print("CHEXC NEX STATE", childNextState, childNextState && childNextState.name);
                 if (childNextState) {
                     this.currentState.onExit();
                     this.currentState = childNextState;
@@ -39,17 +40,6 @@ export abstract class ParentState<TContext, TController> extends State<TContext,
         }
 
         return UpdateResult.ContinueProcessing;
-    }
-
-    addChildState(state: IState): void {
-        this.childStates.push(state);
-    }
-
-    removeChildState(state: IState): void {
-        const index = this.childStates.indexOf(state);
-        if (index !== -1) {
-            this.childStates.splice(index, 1);
-        }
     }
 
     setInitialState(state: IState): void {

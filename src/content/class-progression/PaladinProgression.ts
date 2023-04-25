@@ -36,6 +36,7 @@ export type PaladinAbilities = {
     summonRanged: SummonRanged,
     whitePower: WhitePower,
     perseverance: Perseverance,
+    paladinMastery: PaladinMastery,
 }
 
 export class PaladinProgression extends UnitProgress {

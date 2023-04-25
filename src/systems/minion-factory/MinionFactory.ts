@@ -17,8 +17,8 @@ export class MinionFactory {
     private readonly unitBalances: Record<string, UnitBalanceData> = {};
     private readonly summonLevelId: number;
 
-    private gameBalance: GameBalanceData | null = null;
-    private unitBalance: UnitBalanceData | null = null;
+    private _gameBalance: GameBalanceData | null = null;
+    private _unitBalance: UnitBalanceData | null = null;
 
     private unitTypeStats: Record<number, Record<number, UnitStats>> = {};
 
@@ -62,10 +62,20 @@ export class MinionFactory {
             }
         }
     }
+
+    public get gameBalance(): GameBalanceData {
+        if (!this._gameBalance) throw new Error("Game balance has not been set.");
+        return this._gameBalance;
+    }
+
+    public get unitBalance(): UnitBalanceData {
+        if (!this._unitBalance) throw new Error("Game balance has not been set.");
+        return this._unitBalance;
+    }
     
     public CreateMinion(owner: MapPlayer, unitTypeId: number, level: number, location: ICoords): Unit {
 
-        if (!this.gameBalance) Log.Error("Game balance not set.");
+        if (!this._gameBalance) Log.Error("Game balance not set.");
 
         let u = new Unit(owner, unitTypeId, location.x, location.y, 0);
 
@@ -96,22 +106,22 @@ export class MinionFactory {
     
     public SetGameBalanceSet(id: string): void {
         Log.Info("Setting game balance", id);
-        this.gameBalance = this.gameBalances[id];
+        this._gameBalance = this.gameBalances[id];
     }
 
     public SetUnitBalanceSet(id: string): void {
         Log.Info("Setting unit balance", id);
-        this.unitBalance = this.unitBalances[id];
+        this._unitBalance = this.unitBalances[id];
         this.unitTypeStats = {};
     }
 
     private Calculate(unitTypeId: number, level: number): UnitStats {
         
-        if (!this.unitBalance) {
+        if (!this._unitBalance) {
             Log.Error("Unit balance not set.");
             throw "Unit balance not set.";
         }
-        if (!this.gameBalance) {
+        if (!this._gameBalance) {
             Log.Error("Game balance not set.");
             throw "Game balance not set.";
         }
@@ -119,7 +129,7 @@ export class MinionFactory {
         let retVal = this.unitTypeStats[unitTypeId] && this.unitTypeStats[unitTypeId][level];
         if (retVal) return retVal;
 
-        let weights = this.unitBalance.unitTypeStatWeight[unitTypeId];
+        let weights = this._unitBalance.unitTypeStatWeight[unitTypeId];
         let diceCount: number = 3;
         let diceMaxRoll: number = 2;
         let baseDamage: number = 11;
@@ -131,7 +141,7 @@ export class MinionFactory {
             if (weights.attack) {
                 // Calculate attack first
                 // avgDps
-                let avgDps = (this.gameBalance.minDps + (level - 1) * this.gameBalance.dpsPerLevel) * weights.offenseRatio;
+                let avgDps = (this._gameBalance.minDps + (level - 1) * this._gameBalance.dpsPerLevel) * weights.offenseRatio;
                 Log.Info("avgDps", avgDps);
                 // avgDpr
                 let avgDpr = avgDps * weights.attack.speed * weights.attack.targetsMultiplier / weights.attack.targetsCount;
@@ -153,7 +163,7 @@ export class MinionFactory {
             }
     
             // Calculate effective hp
-            let ehp = (this.gameBalance.minEffectiveHp + (level - 1) * this.gameBalance.ehpPerLevel) * weights.defenseRatio;
+            let ehp = (this._gameBalance.minEffectiveHp + (level - 1) * this._gameBalance.ehpPerLevel) * weights.defenseRatio;
             Log.Info("ehp", ehp);
     
             // Calculate armor

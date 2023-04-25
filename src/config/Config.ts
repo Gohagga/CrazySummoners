@@ -1014,13 +1014,14 @@ export class Config {
         castSfx: 'DeterminationCastAnimMajor.mdl',
         dummyBless: {
             orderId: OrderId.Innerfire,
-            spellCodeId: 'A007'
+            spellCodeId: 'A007',
+            buffCodeId: 'BP02',
         }
     }
 
     rejuvenate: RejuvenateAbilityData = {
         abilityCode: 'AP01',
-        orderId: OrderId.Rejuvination,
+        orderId: OrderId.Parasite,
         orbCost: [OrbType.White, OrbType.White, OrbType.White],
         name: '|cffffff80Rejuvenate|r - 1',
         tooltip: '',

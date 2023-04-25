@@ -18,6 +18,7 @@ export class ResourceBar implements IResourceBarModel {
     private summoningOrbCooldown: number;
     private coloredMaxCount: number;
     private summoningMaxCount: number;
+    private _orbCounts: Record<OrbType, number> = { [OrbType.Blue]: 0, [OrbType.White]: 0, [OrbType.Red]: 0, [OrbType.Purple]: 0, [OrbType.Summoning]: 0, [OrbType.Any]: 0 };
 
     onUpdate = () => {};
 
@@ -51,6 +52,7 @@ export class ResourceBar implements IResourceBarModel {
 
         // Create
         let orb = this.orbFactory.Create(orbType, this.owner);
+        this._orbCounts[orbType]++
 
         this._orbs.push(orb);
         this.onUpdate();
@@ -143,6 +145,24 @@ export class ResourceBar implements IResourceBarModel {
         return cooldown;
     }
 
+    public HasOrbs(cost: OrbType[] | null = null): boolean {
+        if (cost == null) return true;
+
+        let orbReqCount: Record<number, number> = {};
+        for (let orb of cost) {
+            orbReqCount[orb] ||= 0;
+            orbReqCount[orb]++;
+        }
+
+        for (let orbTypeKey of Object.keys(orbReqCount)) {
+            let orbType = Number(orbTypeKey) as OrbType;
+            if (orbReqCount[orbType] > this._orbCounts[orbType])
+                return false;
+        }
+
+        return true;
+    }
+
     public ResetCooldowns(cooldown: number): void {
         for (let orb of this._orbs) {
             if (!orb) continue;
@@ -157,6 +177,7 @@ export class ResourceBar implements IResourceBarModel {
             orb.Destroy();
         }
         this._orbs = [];
+        this._orbCounts = { [OrbType.Blue]: 0, [OrbType.White]: 0, [OrbType.Red]: 0, [OrbType.Purple]: 0, [OrbType.Summoning]: 0, [OrbType.Any]: 0 };
         this.onUpdate();
     }
 }

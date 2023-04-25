@@ -9,7 +9,7 @@ export interface ISummonUnitContext {
 
 export interface ISummonUnitController {
     issueSummonUnitCommand(unitType: string, lane: number): number;
-    getSummonUnitCommandStatus(id: number): 'notStarted' | 'started' | 'done';
+    getCommandStatus(id: number): 'notStarted' | 'started' | 'done';
 }
 
 export class SummonUnitState extends State<ISummonUnitContext, ISummonUnitController> {
@@ -25,7 +25,7 @@ export class SummonUnitState extends State<ISummonUnitContext, ISummonUnitContro
         if (this.commandId == 0) {
             this.commandId = this.controller.issueSummonUnitCommand(this.unitType, this.context.targetLane);
         } else {
-            const status = this.controller.getSummonUnitCommandStatus(this.commandId);
+            const status = this.controller.getCommandStatus(this.commandId);
 
             if (status == 'notStarted') {
                 this.commandId = 0;

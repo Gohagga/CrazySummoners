@@ -29,6 +29,7 @@ export class PaladinMastery extends AbilityBase {
     private readonly restorationMasteryId: number;
     private readonly determinationMasteryId: number;
     private readonly repentanceMasteryId: number;
+    private readonly abilityUpgrade: Record<number, number> = {};
 
     constructor(
         data: PaladinMasteryAbilityData,
@@ -54,6 +55,16 @@ export class PaladinMastery extends AbilityBase {
         this.upgradedAbilities[this.restorationMasteryId] = bonusLevelAbilities.restoration;
         this.upgradedAbilities[this.determinationMasteryId] = bonusLevelAbilities.determination;
         this.upgradedAbilities[this.repentanceMasteryId] = bonusLevelAbilities.repentance;
+
+        for (let ab of bonusLevelAbilities.restoration) {
+            this.abilityUpgrade[ab.id] = this.restorationMasteryId;
+        }
+        for (let ab of bonusLevelAbilities.determination) {
+            this.abilityUpgrade[ab.id] = this.restorationMasteryId;
+        }
+        for (let ab of bonusLevelAbilities.repentance) {
+            this.abilityUpgrade[ab.id] = this.restorationMasteryId;
+        }
 
         let trg = new Trigger();
         trg.registerAnyUnitEvent(EVENT_PLAYER_HERO_SKILL);
@@ -86,6 +97,23 @@ export class PaladinMastery extends AbilityBase {
         }
 
         return true;
+    }
+
+    UpdateHeroAbilityLevel(u: Unit, abilityId: number): number {
+        let upgradeId = this.abilityUpgrade[abilityId];
+        if (!upgradeId) return 0;
+
+        const lvl = u.getAbilityLevel(upgradeId) + 1;
+        u.setAbilityLevel(abilityId, lvl);
+        return lvl;
+    }
+
+    GetHeroAbilityLevel(u: Unit, abilityId: number): number {
+        let upgradeId = this.abilityUpgrade[abilityId];
+        if (!upgradeId) return 0;
+
+        const lvl = u.getAbilityLevel(upgradeId) + 1;
+        return lvl;
     }
 
     OnSkillUp(): void {

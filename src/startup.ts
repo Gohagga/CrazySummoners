@@ -130,7 +130,7 @@ export function initializeGame() {
     const gameEffectsService = new GameEffectsService(minionSummoningService);
 
     //#region Spells
-    const abl = {
+    let abl1 = {
         rejuvenate: new Rejuvenate(config.rejuvenate, abilityEvent, resourceBarManager, spellcastingService, enumService),
         bless: new Bless(config.bless, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory),
         purge: new Purge(config.purge, abilityEvent, resourceBarManager, spellcastingService, enumService, dummyAbilityFactory, unitTypeService),
@@ -148,10 +148,12 @@ export function initializeGame() {
     }
 
     let paladinMastery = new PaladinMastery(config.paladinMastery, abilityEvent, {
-        restoration: [abl.rejuvenate, abl.invigorate],
-        determination: [abl.bless, abl.endure],
-        repentance: [abl.purge, abl.justice]
+        restoration: [abl1.rejuvenate, abl1.invigorate],
+        determination: [abl1.bless, abl1.endure],
+        repentance: [abl1.purge, abl1.justice]
     });
+    
+    const abl = { ...abl1, paladinMastery };
     //#endregion
 
     // Shop
